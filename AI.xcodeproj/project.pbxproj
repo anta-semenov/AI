@@ -12,6 +12,19 @@
 		3A1B7AB41FA7B5AB00E9C31A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3A1B7AB31FA7B5AB00E9C31A /* Assets.xcassets */; };
 		3A1B7AB71FA7B5AB00E9C31A /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3A1B7AB51FA7B5AB00E9C31A /* Main.storyboard */; };
 		3A1B7AC31FA7B5AC00E9C31A /* AITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A1B7AC21FA7B5AC00E9C31A /* AITests.swift */; };
+		3A1B7AEC1FA7B70E00E9C31A /* Brent.json in Resources */ = {isa = PBXBuildFile; fileRef = 3A1B7AE21FA7B70D00E9C31A /* Brent.json */; };
+		3A1B7AED1FA7B70E00E9C31A /* Wheat.json in Resources */ = {isa = PBXBuildFile; fileRef = 3A1B7AE31FA7B70D00E9C31A /* Wheat.json */; };
+		3A1B7AEE1FA7B70E00E9C31A /* AUD.json in Resources */ = {isa = PBXBuildFile; fileRef = 3A1B7AE41FA7B70D00E9C31A /* AUD.json */; };
+		3A1B7AEF1FA7B70E00E9C31A /* GBP.json in Resources */ = {isa = PBXBuildFile; fileRef = 3A1B7AE51FA7B70D00E9C31A /* GBP.json */; };
+		3A1B7AF01FA7B70E00E9C31A /* CAD.json in Resources */ = {isa = PBXBuildFile; fileRef = 3A1B7AE61FA7B70D00E9C31A /* CAD.json */; };
+		3A1B7AF11FA7B70E00E9C31A /* CHF.json in Resources */ = {isa = PBXBuildFile; fileRef = 3A1B7AE71FA7B70D00E9C31A /* CHF.json */; };
+		3A1B7AF21FA7B70E00E9C31A /* Gold.json in Resources */ = {isa = PBXBuildFile; fileRef = 3A1B7AE81FA7B70E00E9C31A /* Gold.json */; };
+		3A1B7AF31FA7B70E00E9C31A /* JPY(need 1000 divide to value).json in Resources */ = {isa = PBXBuildFile; fileRef = 3A1B7AE91FA7B70E00E9C31A /* JPY(need 1000 divide to value).json */; };
+		3A1B7AF41FA7B70E00E9C31A /* Soybean.json in Resources */ = {isa = PBXBuildFile; fileRef = 3A1B7AEA1FA7B70E00E9C31A /* Soybean.json */; };
+		3A1B7AF51FA7B70E00E9C31A /* EUR.json in Resources */ = {isa = PBXBuildFile; fileRef = 3A1B7AEB1FA7B70E00E9C31A /* EUR.json */; };
+		3A4087841FA99FCA002F8575 /* DataConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A4087831FA99FCA002F8575 /* DataConverter.swift */; };
+		3A4087871FA9AC26002F8575 /* DayData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A4087861FA9AC26002F8575 /* DayData.swift */; };
+		3AF8D8BC1FA9DB2A00117E97 /* DataSet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AF8D8BB1FA9DB2A00117E97 /* DataSet.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -35,6 +48,19 @@
 		3A1B7ABE1FA7B5AC00E9C31A /* AITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		3A1B7AC21FA7B5AC00E9C31A /* AITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AITests.swift; sourceTree = "<group>"; };
 		3A1B7AC41FA7B5AC00E9C31A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		3A1B7AE21FA7B70D00E9C31A /* Brent.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = Brent.json; sourceTree = "<group>"; };
+		3A1B7AE31FA7B70D00E9C31A /* Wheat.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = Wheat.json; sourceTree = "<group>"; };
+		3A1B7AE41FA7B70D00E9C31A /* AUD.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = AUD.json; sourceTree = "<group>"; };
+		3A1B7AE51FA7B70D00E9C31A /* GBP.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = GBP.json; sourceTree = "<group>"; };
+		3A1B7AE61FA7B70D00E9C31A /* CAD.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = CAD.json; sourceTree = "<group>"; };
+		3A1B7AE71FA7B70D00E9C31A /* CHF.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = CHF.json; sourceTree = "<group>"; };
+		3A1B7AE81FA7B70E00E9C31A /* Gold.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = Gold.json; sourceTree = "<group>"; };
+		3A1B7AE91FA7B70E00E9C31A /* JPY(need 1000 divide to value).json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "JPY(need 1000 divide to value).json"; sourceTree = "<group>"; };
+		3A1B7AEA1FA7B70E00E9C31A /* Soybean.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = Soybean.json; sourceTree = "<group>"; };
+		3A1B7AEB1FA7B70E00E9C31A /* EUR.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = EUR.json; sourceTree = "<group>"; };
+		3A4087831FA99FCA002F8575 /* DataConverter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataConverter.swift; sourceTree = "<group>"; };
+		3A4087861FA9AC26002F8575 /* DayData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DayData.swift; sourceTree = "<group>"; };
+		3AF8D8BB1FA9DB2A00117E97 /* DataSet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataSet.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -58,6 +84,7 @@
 		3A1B7AA31FA7B5AB00E9C31A = {
 			isa = PBXGroup;
 			children = (
+				3A1B7ACD1FA7B69300E9C31A /* DataSetsRaw */,
 				3A1B7AAE1FA7B5AB00E9C31A /* AI */,
 				3A1B7AC11FA7B5AC00E9C31A /* AITests */,
 				3A1B7AAD1FA7B5AB00E9C31A /* Products */,
@@ -76,6 +103,8 @@
 		3A1B7AAE1FA7B5AB00E9C31A /* AI */ = {
 			isa = PBXGroup;
 			children = (
+				3A4087851FA9AC01002F8575 /* dataTypes */,
+				3A4087821FA99FA2002F8575 /* utils */,
 				3A1B7AAF1FA7B5AB00E9C31A /* AppDelegate.swift */,
 				3A1B7AB11FA7B5AB00E9C31A /* ViewController.swift */,
 				3A1B7AB31FA7B5AB00E9C31A /* Assets.xcassets */,
@@ -93,6 +122,40 @@
 				3A1B7AC41FA7B5AC00E9C31A /* Info.plist */,
 			);
 			path = AITests;
+			sourceTree = "<group>";
+		};
+		3A1B7ACD1FA7B69300E9C31A /* DataSetsRaw */ = {
+			isa = PBXGroup;
+			children = (
+				3A1B7AE41FA7B70D00E9C31A /* AUD.json */,
+				3A1B7AE21FA7B70D00E9C31A /* Brent.json */,
+				3A1B7AE61FA7B70D00E9C31A /* CAD.json */,
+				3A1B7AE71FA7B70D00E9C31A /* CHF.json */,
+				3A1B7AEB1FA7B70E00E9C31A /* EUR.json */,
+				3A1B7AE51FA7B70D00E9C31A /* GBP.json */,
+				3A1B7AE81FA7B70E00E9C31A /* Gold.json */,
+				3A1B7AE91FA7B70E00E9C31A /* JPY(need 1000 divide to value).json */,
+				3A1B7AEA1FA7B70E00E9C31A /* Soybean.json */,
+				3A1B7AE31FA7B70D00E9C31A /* Wheat.json */,
+			);
+			path = DataSetsRaw;
+			sourceTree = "<group>";
+		};
+		3A4087821FA99FA2002F8575 /* utils */ = {
+			isa = PBXGroup;
+			children = (
+				3A4087831FA99FCA002F8575 /* DataConverter.swift */,
+			);
+			path = utils;
+			sourceTree = "<group>";
+		};
+		3A4087851FA9AC01002F8575 /* dataTypes */ = {
+			isa = PBXGroup;
+			children = (
+				3A4087861FA9AC26002F8575 /* DayData.swift */,
+				3AF8D8BB1FA9DB2A00117E97 /* DataSet.swift */,
+			);
+			path = dataTypes;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -178,8 +241,18 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3A1B7AF51FA7B70E00E9C31A /* EUR.json in Resources */,
+				3A1B7AF41FA7B70E00E9C31A /* Soybean.json in Resources */,
 				3A1B7AB41FA7B5AB00E9C31A /* Assets.xcassets in Resources */,
+				3A1B7AF21FA7B70E00E9C31A /* Gold.json in Resources */,
+				3A1B7AF11FA7B70E00E9C31A /* CHF.json in Resources */,
+				3A1B7AEC1FA7B70E00E9C31A /* Brent.json in Resources */,
+				3A1B7AF01FA7B70E00E9C31A /* CAD.json in Resources */,
 				3A1B7AB71FA7B5AB00E9C31A /* Main.storyboard in Resources */,
+				3A1B7AEF1FA7B70E00E9C31A /* GBP.json in Resources */,
+				3A1B7AED1FA7B70E00E9C31A /* Wheat.json in Resources */,
+				3A1B7AEE1FA7B70E00E9C31A /* AUD.json in Resources */,
+				3A1B7AF31FA7B70E00E9C31A /* JPY(need 1000 divide to value).json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -197,7 +270,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3A4087871FA9AC26002F8575 /* DayData.swift in Sources */,
+				3AF8D8BC1FA9DB2A00117E97 /* DataSet.swift in Sources */,
 				3A1B7AB21FA7B5AB00E9C31A /* ViewController.swift in Sources */,
+				3A4087841FA99FCA002F8575 /* DataConverter.swift in Sources */,
 				3A1B7AB01FA7B5AB00E9C31A /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -22,6 +22,9 @@ class ViewController: NSViewController {
         }
     }
 
-
+    @IBAction func prepareDataSet(_ sender: NSButton) {
+        convertData()
+    }
+    
 }
 
