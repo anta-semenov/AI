@@ -1,6 +1,6 @@
 const math = require('mathjs')
 
-const convolutionLayer = (input, filters, step) => {
+export const convolutionLayer = (input: number[][], filters: number[][], step: number): number[][] => {
   const inputSize = math.size(input)
   //create result matrix
   filters.forEach(filter => {
