@@ -5,6 +5,7 @@
   "main": "lib/index.js",
   "scripts": {
     "test": "jest",
+    "test:watch": "jest --watch",
     "build": "babel src/ -d lib/",
     "clean": "rimraf ./lib",
     "start": "yarn run clean && yarn run build && node ./lib/index.js"
