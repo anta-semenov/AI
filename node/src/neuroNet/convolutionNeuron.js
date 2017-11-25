@@ -53,3 +53,14 @@ export const convolutionLayer = (input, filters, step) => {
 
   return convolutionResult
 }
+
+export const convolutionLayerCreator = (dnaIndex: number, dna: number[], size: number[], step: number) => {
+  const weigthsAmount = size.reduce((result, item) => result * item, 1)
+  const filters = math.reshape(dna.slice(dnaIndex + 1, dnaIndex + 1 + weigthsAmount), size)
+  const layer = input => convolutionLayer(input, filters, step)
+
+  return ({
+    layer: {calculate: layer},
+    dnaIndex: dnaIndex + weigthsAmount
+  })
+}
