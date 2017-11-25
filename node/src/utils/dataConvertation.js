@@ -2,7 +2,7 @@ const fs = require("fs")
 const path = require("path")
 const dateFns = require("date-fns")
 
-const symbols = ['AUD', 'EUR', 'GBP', 'CHF', 'CAD', 'JPY', 'Brent', 'Gold', 'Wheat', 'Soybean']
+const symbols = ['AUD', 'EUR', 'GBP', 'CHF', 'CAD', 'JPY', 'Brent', 'Gold', 'Wheat', 'Soybean', 'XOM']
 
 let nullOpenCount = 0
 let nullCloseCount = 0
@@ -35,6 +35,40 @@ const convertData = () => {
   console.log('nullHighCount: ', nullHighCount)
   console.log('nullLowCount: ', nullLowCount)
   console.log('==============================')
+
+  // make per date date
+
+  const tempLearnData = {}
+  Object.keys(result.learnData).forEach(symbol => {
+    result.learnData[symbol].forEach(symbolDayData => {
+      const currentDayDate = tempLearnData[symbolDayData.date] || {}
+      tempLearnData[symbolDayData.date] = {
+        ...currentDayDate,
+        [symbol]: symbolDayData
+      }
+    })
+  })
+
+  const tempTestData = {}
+  Object.keys(result.testData).forEach(symbol => {
+    result.learnData[symbol].forEach(symbolDayData => {
+      const currentDayDate = tempTestData[symbolDayData.date] || {}
+      tempTestData[symbolDayData.date] = {
+        ...currentDayDate,
+        [symbol]: symbolDayData
+      }
+    })
+  })
+
+  const perDateData = {
+    learnData: Object.values(tempLearnData),
+    testData: Object.values(tempTestData)
+  }
+
+  fs.writeFileSync(
+    path.resolve('../DataSet', `perDateData.json`),
+    JSON.stringify(perDateData)
+  )
 }
 
 const processFile = symbol => {
