@@ -1,8 +1,7 @@
-const fs = require("fs")
-const path = require("path")
-const dateFns = require("date-fns")
-
-const symbols = ['AUD', 'EUR', 'GBP', 'CHF', 'CAD', 'JPY', 'Brent', 'Gold', 'Wheat', 'Soybean', 'XOM']
+const fs = require('fs')
+const path = require('path')
+const dateFns = require('date-fns')
+const symbols = require('../constants').symbols
 
 let nullOpenCount = 0
 let nullCloseCount = 0
@@ -24,7 +23,7 @@ const convertData = () => {
   })
 
   fs.writeFileSync(
-    path.resolve('../DataSet', `data.json`),
+    path.resolve('../DataSet', 'data.json'),
     JSON.stringify(result)
   )
 
@@ -51,7 +50,7 @@ const convertData = () => {
 
   const tempTestData = {}
   Object.keys(result.testData).forEach(symbol => {
-    result.learnData[symbol].forEach(symbolDayData => {
+    result.testData[symbol].forEach(symbolDayData => {
       const currentDayDate = tempTestData[symbolDayData.date] || {}
       tempTestData[symbolDayData.date] = {
         ...currentDayDate,

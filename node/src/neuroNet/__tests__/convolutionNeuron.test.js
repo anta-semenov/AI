@@ -1,4 +1,5 @@
-import {convolutionLayer} from '../convolutionNeuron'
+import math from 'mathjs'
+import {convolutionLayer, convolutionLayerCreator} from '../convolutionNeuron'
 
 describe('Convolution Layer Tests', () => {
   it('Should work correctly for 2 dimension matrix with one filter', () => {
@@ -45,7 +46,7 @@ describe('Convolution Layer Tests', () => {
     expect(convolutionLayer(input, [filter], 1)).toEqual(expectResult)
   })
 
-  it('Should work with multi tests and full size filter dimension', () => {
+  it('Should work with multi filters and full size filter dimension', () => {
     const input = [
       [1, 0, 0, 0],
       [1, 2, 0, 0],
@@ -73,5 +74,46 @@ describe('Convolution Layer Tests', () => {
       [1 ,3, 6],
       [1, 6, 10]
     ]
+
+    expect(convolutionLayer(input, filters, 1)).toEqual(expectResult)
+  })
+
+  describe('Layer creator', () => {
+    it('should create corect layer', () => {
+      const input = [
+        [1, 0, 0, 0],
+        [1, 2, 0, 0],
+        [1, 2, 3, 0],
+        [1, 2, 3, 4]
+      ]
+
+      const filters = [
+        [
+          [1, 0, 1, 0],
+          [0, 1, 0, 1]
+        ],
+        [
+          [1, 1, 1, 1],
+          [0, 0, 0, 0]
+        ],
+        [
+          [1, 1, 0, 0],
+          [0, 0, 1, 1]
+        ],
+      ]
+
+      const expectResult = [
+        [3, 3, 10],
+        [1 ,3, 6],
+        [1, 6, 10]
+      ]
+
+      const dna = [0, 1, 2, 3, 4, 5, ...math.reshape(filters, [24]), 56, 78, 89]
+
+      const creatorResult = convolutionLayerCreator(5, dna, [3, 2, 4], 1)
+
+      expect(dna[creatorResult.dnaIndex + 1]).toEqual(56)
+      expect(creatorResult.layer.calculate(input)).toEqual(expectResult)
+    })
   })
 })
