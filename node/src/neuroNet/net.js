@@ -65,7 +65,5 @@ export const netCreator = ({layers, numberOfSymbols, weigthsDNA}: NetSchema) => 
     return output
   }
 
-  return ({
-    net
-  })
+  return net
 }
