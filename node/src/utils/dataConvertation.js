@@ -1,7 +1,7 @@
-const fs = require('fs')
-const path = require('path')
-const dateFns = require('date-fns')
-const symbols = require('../constants').symbols
+import fs from 'fs'
+import path from 'path'
+import dateFns from 'date-fns'
+import {symbols, INPUT_DEEP} from '../constants'
 
 let nullOpenCount = 0
 let nullCloseCount = 0
@@ -27,17 +27,9 @@ const convertData = () => {
     JSON.stringify(result)
   )
 
-  console.log('==============================')
-  console.log('Data convertion finished')
-  console.log('nullOpenCount: ', nullOpenCount)
-  console.log('nullCloseCount: ', nullCloseCount)
-  console.log('nullHighCount: ', nullHighCount)
-  console.log('nullLowCount: ', nullLowCount)
-  console.log('==============================')
-
   // make per date date
 
-  const tempLearnData = {}
+  let tempLearnData = {}
   Object.keys(result.learnData).forEach(symbol => {
     result.learnData[symbol].forEach(symbolDayData => {
       const currentDayDate = tempLearnData[symbolDayData.date] || {}
@@ -47,8 +39,9 @@ const convertData = () => {
       }
     })
   })
+  tempLearnData = Object.values(tempLearnData).filter(dayData => Object.keys(dayData).length === symbols.length)
 
-  const tempTestData = {}
+  let tempTestData = {}
   Object.keys(result.testData).forEach(symbol => {
     result.testData[symbol].forEach(symbolDayData => {
       const currentDayDate = tempTestData[symbolDayData.date] || {}
@@ -58,16 +51,54 @@ const convertData = () => {
       }
     })
   })
+  tempTestData = Object.values(tempTestData).filter(dayData => Object.keys(dayData).length === symbols.length)
 
   const perDateData = {
-    learnData: Object.values(tempLearnData),
-    testData: Object.values(tempTestData)
+    learnData: tempLearnData,
+    testData: tempTestData
   }
 
   fs.writeFileSync(
     path.resolve('../DataSet', `perDateData.json`),
     JSON.stringify(perDateData)
   )
+
+  const filteredLearnDataPerSymbol = {}
+  const filteredTestDataPerSymbol = {}
+  symbols.forEach(symbol => {
+    filteredLearnDataPerSymbol[symbol] = []
+    filteredTestDataPerSymbol[symbol] = []
+  })
+
+  tempLearnData.forEach(dayData => {
+    symbols.forEach(symbol => {
+      filteredLearnDataPerSymbol[symbol].push(dayData[symbol])
+    })
+  })
+
+  tempTestData.forEach(dayData => {
+    symbols.forEach(symbol => {
+      filteredTestDataPerSymbol[symbol].push(dayData[symbol])
+    })
+  })
+
+  fs.writeFileSync(
+    path.resolve('../DataSet', 'data.json'),
+    JSON.stringify({
+      learnData: filteredLearnDataPerSymbol,
+      testData: filteredTestDataPerSymbol
+    })
+  )
+
+  console.log('==============================')
+  console.log('Data convertion finished')
+  console.log('nullOpenCount: ', nullOpenCount)
+  console.log('nullCloseCount: ', nullCloseCount)
+  console.log('nullHighCount: ', nullHighCount)
+  console.log('nullLowCount: ', nullLowCount)
+  console.log(`learn data whole: ${result.learnData[symbols[0]].length}, filtered: ${tempLearnData.length}`)
+  console.log(`test data whole: ${result.testData[symbols[0]].length}, filtered: ${tempTestData.length}`)
+  console.log('==============================')
 }
 
 const processFile = symbol => {
@@ -104,7 +135,7 @@ const processFile = symbol => {
     last20Low.push(low)
     last20High.push(high)
 
-    if (last20Low.length > 20) {
+    if (last20Low.length > INPUT_DEEP) {
       last20Low.shift()
       last20High.shift()
     }
@@ -117,8 +148,8 @@ const processFile = symbol => {
       low,
       maxAbsolute,
       minAbsolute,
-      max20: last20High.reduce((res, item) => Math.max(res, item || 0), 0),
-      min20: last20Low.reduce((res, item) => Math.min(res, item || DEFAULT_MIN), DEFAULT_MIN)
+      maxLocal: last20High.reduce((res, item) => Math.max(res, item || 0), 0),
+      minLocal: last20Low.reduce((res, item) => Math.min(res, item || DEFAULT_MIN), DEFAULT_MIN)
     })
 
     if (dayData.date < dateFns.parse('2008-01-01').getTime()) {
@@ -134,4 +165,4 @@ const processFile = symbol => {
   })
 }
 
-module.exports = convertData
+export default convertData

@@ -78,6 +78,57 @@ describe('Convolution Layer Tests', () => {
     expect(convolutionLayer(input, filters, 1)).toEqual(expectResult)
   })
 
+  it('Should work with gorizontal movements', () => {
+    const input = [
+      [1, 0, 0, 0],
+      [1, 2, 0, 0],
+      [1, 2, 3, 0],
+      [1, 2, 3, 4]
+    ]
+
+    const filter = [
+      [1, 0],
+      [0, 1],
+      [1, 1],
+      [0, 0]
+    ]
+
+    const expectResult = [[6, 5, 3]]
+
+    expect(convolutionLayer(input, [filter], 1)).toEqual(expectResult)
+  })
+
+  it('Should work with gorizontal movements and multi filters', () => {
+    const input = [
+      [1, 0, 0, 0],
+      [1, 2, 0, 0],
+      [1, 2, 3, 0],
+      [1, 2, 3, 4]
+    ]
+
+    const filters = [
+      [
+        [1, 0],
+        [0, 1],
+        [1, 1],
+        [0, 0]
+      ],
+      [
+        [0, 1],
+        [1, 0],
+        [0, 0],
+        [1, 1]
+      ]
+    ]
+
+    const expectResult = [
+      [6, 5, 3],
+      [4, 7, 7]
+    ]
+
+    expect(convolutionLayer(input, filters, 1)).toEqual(expectResult)
+  })
+
   describe('Layer creator', () => {
     it('should create corect layer', () => {
       const input = [
@@ -110,7 +161,7 @@ describe('Convolution Layer Tests', () => {
 
       const dna = [0, 1, 2, 3, 4, 5, ...math.reshape(filters, [24]), 56, 78, 89]
 
-      const creatorResult = convolutionLayerCreator(5, dna, [3, 2, 4], 1)
+      const creatorResult = convolutionLayerCreator(5, dna, {size: [3, 2, 4], step: 1})
 
       expect(dna[creatorResult.dnaIndex + 1]).toEqual(56)
       expect(creatorResult.layer.calculate(input)).toEqual(expectResult)

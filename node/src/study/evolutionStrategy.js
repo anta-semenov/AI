@@ -7,7 +7,7 @@ import {save} from '../utils/file'
 
 export const runEntity = (layers, dna, data) => {
   const outputHandler = outputHandlerCreator(symbols)
-
+  const entityStartTime = Date.now()
   const net = netCreator({
     layers,
     numberOfSymbols: symbols.length,
@@ -18,12 +18,18 @@ export const runEntity = (layers, dna, data) => {
   let dayIndex = INPUT_DEEP
 
   while (dayIndex < numberOfDays) {
+    const dayStartTime = Date.now()
     const inputs = getInputs(data, dayIndex)
     const outputs = net(inputs)
     outputHandler.handle(outputs, getDayPriceData(dayIndex + 1, data))
 
     dayIndex++
   }
+
+  console.log('++++++++++++++++++++++++++')
+  console.log(`entity time: ${Date.now() - entityStartTime} ms`)
+  console.log(`entity score: ${outputHandler.getScore()}`)
+  console.log('--------------------------')
 
   return outputHandler.getScore()
 }

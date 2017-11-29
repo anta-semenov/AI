@@ -32,7 +32,7 @@ export const netCreator = ({layers, numberOfSymbols, weigthsDNA}: NetSchema) => 
   const fullConnectedLayers = []
   layers.forEach((layer, index) => {
     if (layer.type === 'convolution') {
-      const creatorResult = convolutionLayerCreator(dnaIndex, weigthsDNA, layer.size, layer.step)
+      const creatorResult = convolutionLayerCreator(dnaIndex, weigthsDNA, layer)
       convolutionLayers.push(creatorResult.layer)
       dnaIndex = creatorResult.dnaIndex
     }
@@ -50,16 +50,19 @@ export const netCreator = ({layers, numberOfSymbols, weigthsDNA}: NetSchema) => 
   })
   const net = (input: number[][][]) => {
     let output = []
+    console.log('====================');
     input.forEach(instrumentInput => {
       let layerOutput = instrumentInput
       convolutionLayers.forEach(layer => {
         layerOutput = layer.calculate(layerOutput)
       })
       output = [...output, ...layerOutput]
+      console.log('outputs', output);
     })
 
     fullConnectedLayers.forEach(layer => {
       output = layer.calculate(output)
+      console.log('outputs', output);
     })
 
     return output

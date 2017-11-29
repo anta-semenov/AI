@@ -2,11 +2,14 @@ import math from 'mathjs'
 import {subrange} from '../utils/subrange'
 import {increaseIndex} from '../utils/increaseIndex'
 
-export const convolutionLayer = (input, filters, step) => {
+export const convolutionLayer = (input, filters, step, trashold) => {
   const inputSize = math.size(input)
   const filterSize = math.size(filters[0])
 
   if (filterSize.length !== inputSize.length) {
+    // console.log('filters', filters);
+    console.log('filterSize', filterSize);
+    console.log('input', inputSize);
     throw new Error('Filter and input dimensions are not the same')
   }
 
@@ -40,7 +43,11 @@ export const convolutionLayer = (input, filters, step) => {
     while (checkFilterIndex(filterInputIndex)) {
       const endIndex = filterInputIndex.map((dimensionIndex, index) => dimensionIndex + filterSize[index] - 1)
       const subinput = math.flatten(subrange(input, filterInputIndex, endIndex))
-      const dot = math.dot(flattenFilter, subinput)
+      let dot = math.dot(flattenFilter, subinput)
+
+      if (trashold) {
+        dot = dot >= trashold ? 1 : 0
+      }
 
       filterResult = math.subset(filterResult, math.index(...resultIndex), dot, 0)
 
@@ -54,10 +61,10 @@ export const convolutionLayer = (input, filters, step) => {
   return convolutionResult
 }
 
-export const convolutionLayerCreator = (dnaIndex: number, dna: number[], size: number[], step: number) => {
+export const convolutionLayerCreator = (dnaIndex: number, dna: number[], {size, step, trashold}) => {
   const weigthsAmount = size.reduce((result, item) => result * item, 1)
   const filters = math.reshape(dna.slice(dnaIndex + 1, dnaIndex + 1 + weigthsAmount), size)
-  const layer = input => convolutionLayer(input, filters, step)
+  const layer = input => convolutionLayer(input, filters, step, trashold)
 
   return ({
     layer: {calculate: layer},
