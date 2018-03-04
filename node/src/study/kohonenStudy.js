@@ -1,9 +1,12 @@
 import math from 'mathjs'
 import {randomInt} from './utils'
-import {kohonen, getDistance} from '../neuroNet/kohonen'
+import {kohonen, getDistance, kohonenNet, kohonenConvolutionLayer} from '../neuroNet/kohonen'
+import {subrange} from '../utils/subrange'
+import {increaseIndex} from '../utils/increaseIndex'
+import {mapMatrix} from '../utils/mapMatrix'
 
 
-const correctWeights = (input, weights, h) => wieghts.map((weight, index) =>
+const correctWeights = (input, weights, h) => weights.map((weight, index) =>
   weight + h * (input[index] - weight)
 )
 
@@ -17,9 +20,9 @@ const h = (iteration, distanceFromWinner) => {
 export const kohonenStudyIteration = (iteration, input, filters) => {
   const winner = kohonen(input, filters)
   const error = getDistance(input, filters[winner])
-  const filters filters.map((filter, index) => correctWeights(input, filter. h(iteration, winner - index)))
+  const newFilters = filters.map((filter, index) => correctWeights(input, filter, h(iteration + 1, winner - index)))
 
-  return ({error, filters})
+  return ({error, filters: newFilters})
 }
 
 export const kohonenStudy = ({data, numberOfFilters, error, maxIterations}) => {
@@ -28,7 +31,8 @@ export const kohonenStudy = ({data, numberOfFilters, error, maxIterations}) => {
   const filterSize = math.size(data[0])
   const size = math.flatten(data[0]).length
   let filters = (new Array(numberOfFilters)).fill(0).map((_, index) => {
-    math.flatten(data[startFilterInitIndex + Math.trunc(index * size * 0.7)])
+    const randomDataIndex = startFilterInitIndex + Math.trunc(index * size * 3)
+    return math.flatten(data[randomDataIndex])
   })
 
   let currentMaxIteration = maxIterations
@@ -50,5 +54,44 @@ export const kohonenStudy = ({data, numberOfFilters, error, maxIterations}) => {
     }
   }
 
-  return math.reshape(filters, filterSize)
+  return math.reshape(filters, [numberOfFilters, ...filterSize])
+}
+
+export const kohonenNetStudy = (data, layers) => {
+  const resultLayers = []
+  let processedData = data
+
+  layers.forEach(({type, size, step}, index) => {
+    if (type !== 'kohonen') {
+      return
+    }
+    console.log('-------------')
+    console.log(`kohonen layer: ${index}, ${size}`)
+    const filterSize = size.slice(1)
+
+    const learnData = prepareLearnData(processedData, filterSize, step)
+    const layerFilters = kohonenStudy({data: learnData, numberOfFilters: size[0]})
+    resultLayers.push({
+      filters: layerFilters,
+      step
+    })
+    console.log(`filters: ${layerFilters}`)
+
+    processedData = processedData.map(dataItem => kohonenConvolutionLayer(dataItem, layerFilters, step))
+  })
+
+  return resultLayers
+}
+
+export const prepareLearnData = (input, filterSize, step) => {
+  if (math.size(input).length === filterSize.length + 1) {
+    const result = []
+    input.forEach(inputItem => {
+      const newInput = mapMatrix(inputItem, filterSize, step, subrange => subrange)
+      result.push(...newInput)
+    })
+    return result
+  } else {
+    return mapMatrix(input, filterSize, step, subrange => subrange)
+  }
 }

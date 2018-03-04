@@ -127,8 +127,8 @@ const processFile = symbol => {
   tempData.forEach((dayData, index, array) => {
     const open = dayData.open || array[index - 1].close
     const close = dayData.close || array[index + 1].open
-    const high = dayData.high || Math.max(open, close)
-    const low = dayData.low || Math.min(open, close)
+    const high = Math.max(dayData.high || 0, open, close)
+    const low = Math.min(dayData.low || DEFAULT_MIN, open, close)
 
     minAbsolute = Math.min(minAbsolute, low || DEFAULT_MIN)
     maxAbsolute = Math.max(maxAbsolute, high || 0)

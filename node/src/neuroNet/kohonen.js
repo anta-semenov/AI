@@ -1,6 +1,7 @@
 import math from 'mathjs'
+import {mapMatrix} from '../utils/mapMatrix'
 
-export const getDistance = (input, weigths) => weigthsreduce((res, weight, index) => {
+export const getDistance = (input, weigths) => weigths.reduce((res, weight, index) => {
   return res + Math.abs(weight - input[index])
 }, 0)
 
@@ -11,7 +12,7 @@ export const kohonen = (input, filters) => {
 
   filters.forEach((filter, filterIndex) => {
     const flatFilter = math.flatten(filter)
-    if (flatFilter.length !== flatInput.index) {
+    if (flatFilter.length !== flatInput.length) {
       throw Error('Kohonen: Filter and Input have different size')
     }
 
@@ -26,6 +27,25 @@ export const kohonen = (input, filters) => {
   return minFilterIndex
 }
 
-export const kohonenConvolutionLayer = (input, filters) => {
-  
+export const kohonenConvolutionLayer = (input, filters, step) => {
+  const inputSize = math.size(input)
+  const filterSize = math.size(filters[0])
+
+  if (filterSize.length !== inputSize.length) {
+    // console.log('filters', filters);
+    console.log('filterSize', filterSize);
+    console.log('input', inputSize);
+    throw new Error('Filter and input dimensions are not the same')
+  }
+
+  return mapMatrix(input, filterSize, step, subrange => kohonen(subrange, filters))
+}
+
+export const kohonenNet = (input, layers) => {
+  let output = input
+  layers.forEach(layer => {
+    output = kohonenConvolutionLayer(output, layer.filters, layer.step)
+  })
+
+  return output
 }

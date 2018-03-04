@@ -1,7 +1,7 @@
 import {getLayerOutputSize} from '../neuroNet/net'
 
 const random = (start: number = 0, end: number = 1) => Math.random() * end + start
-const randomInt = (start: number = 0, end: number = 10) => Math.trunc(Math.random() * end) + start
+export const randomInt = (start: number = 0, end: number = 10) => Math.trunc(Math.random() * end) + start
 
 export const createDNA  = ({layers, numberOfSymbols}) => {
   const dna = []

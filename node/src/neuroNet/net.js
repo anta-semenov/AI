@@ -7,6 +7,12 @@ type ConvolutionLayer = {
   step: number
 }
 
+type KohonenLayer = {
+  type: 'kohonen',
+  size: number[],
+  step: number
+}
+
 type FullConnectedLayer = {
   type: 'fullConnected',
   size: number
