@@ -5,6 +5,7 @@ import {kohonenNetStudy} from './study/kohonenStudy'
 import {mapMatrix} from './utils/mapMatrix'
 import convertData from './utils/dataConvertation'
 import {INPUT_DEEP} from './constants'
+import {kohonenNet} from './neuroNet/kohonen'
 
 // convertData()
 
@@ -108,33 +109,49 @@ symbols.forEach(symbol => {
   }
 })
 
+const unshiftKohonenInputData = (input, symbol, dataItem) => {
+  const {open, close, high, low, minLocal, maxLocal, minAbsolute, maxAbsolute} = dataItem[symbol]
+  inputBuffer[symbol].local.unshift([
+    normalize(open, minLocal, maxLocal),
+    normalize(high, minLocal, maxLocal),
+    normalize(low, minLocal, maxLocal),
+    normalize(close, minLocal, maxLocal)
+  ])
+  inputBuffer[symbol].absolute.unshift([
+    normalize(open, minAbsolute, maxAbsolute),
+    normalize(high, minAbsolute, maxAbsolute),
+    normalize(low, minAbsolute, maxAbsolute),
+    normalize(close, minAbsolute, maxAbsolute)
+  ])
+}
+
 dayData.learnData.forEach((dataItem, index) => {
   const kohonenResult = []
   const outputResult = []
-  if (index < INPUT_DEEP) {
+  if (index <= INPUT_DEEP) {
     symbols.forEach(symbol => {
-      const {open, close, high, low, minLocal, maxLocal, minAbsolute, maxAbsolute} = dataItem[symbol]
-      inputBuffer[symbol].local.push([
-        normalize(open, minLocal, maxLocal),
-        normalize(high, minLocal, maxLocal),
-        normalize(low, minLocal, maxLocal),
-        normalize(close, minLocal, maxLocal)
-      ])
-      inputBuffer[symbol].absolute.push([
-        normalize(open, minAbsolute, maxAbsolute),
-        normalize(high, minAbsolute, maxAbsolute),
-        normalize(low, minAbsolute, maxAbsolute),
-        normalize(close, minAbsolute, maxAbsolute)
-      ])
+      unshiftKohonenInputData(inputBuffer, symbol, dataItem[symbol])
     })
     return
-  }
+  } else if (index < dayData.learnData.length - 1) {
+    const dayResult = {
+      input: [],
+      output: []
+    }
 
-  if (index === INPUT_DEEP) {
     symbols.forEach(symbol => {
-      inputBuffer[symbol].local = inputBuffer[symbol].local.reverse()
-      inputBuffer[symbol].absolute = inputBuffer[symbol].absolute.reverse()
+      // Вход для символа представляет собой массив свечек где 0 это вчера
+      // берем текущие данные и результат за пред день и вычисляем выходы
+
+      // Calculate result per symbols
+      // run kohonenNet для каждого символа
+      // и добовляем inputs результата
     })
+
+
+    // добавляем данные текущего дня в инпут сети
+    inputBuffer.pop()
+    unshiftKohonenInputData(inputBuffer, symbol, dataItem[symbol])
   }
 })
 
