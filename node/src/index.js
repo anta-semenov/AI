@@ -125,6 +125,20 @@ const unshiftKohonenInputData = (input, symbol, dataItem) => {
   ])
 }
 
+const getSymbolDayResult = (tomorrowOpen, open, low, high) => {
+  const openPercent = Math.abs(((tomorrowOpen - open) / open) * 100)
+  const lowPercent = Math.abs(((low - open) / open) * 100)
+  const highPercent = Math.abs(((high - open) / open) * 100)
+
+  if (tomorrowOpen > open && openPercent > 4 && lowPercent < 10) {
+    return [1, 0]
+  } else if (tomorrowOpen < open && openPercent > 4 && highPercent < 10) {
+    return [0, 1]
+  } else {
+    return [0, 0]
+  }
+}
+
 dayData.learnData.forEach((dataItem, index) => {
   const kohonenResult = []
   const outputResult = []
@@ -142,6 +156,14 @@ dayData.learnData.forEach((dataItem, index) => {
     symbols.forEach(symbol => {
       // Вход для символа представляет собой массив свечек где 0 это вчера
       // берем текущие данные и результат за пред день и вычисляем выходы
+      const symbolDayData = dataItem[symbol]
+      const symbolDayResult = getSymbolDayResult(
+        dayData.learnData[index + 1][symbol].open,
+        symbolDayData.open,
+        symbolDayData.low,
+        symbolDayData.high,
+      )
+      dayResult.output.push(...symbolDayResult)
 
       // Calculate result per symbols
       // run kohonenNet для каждого символа
