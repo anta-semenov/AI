@@ -1,0 +1,18 @@
+{
+    "ecmaFeatures": {
+      "modules": true
+    },
+    "env": {
+      "node": true,
+      "jest": true,
+      "mocha": true
+    },
+    "parser": "babel-eslint",
+    "rules": {
+      "quotes": [1, "single"],
+      "strict": [2, "never"],
+      "semi": [0, "always"],
+      "no-unused-vars": [1]
+    },
+    "extends": "eslint:recommended",
+}

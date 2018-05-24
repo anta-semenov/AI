@@ -41,11 +41,16 @@ export const kohonenConvolutionLayer = (input, filters, step) => {
   return mapMatrix(input, filterSize, step, subrange => kohonen(subrange, filters))
 }
 
-export const kohonenNet = (input, layers) => {
+export const kohonenNet = (input, layers, convertOutput) => {
   let output = input
   layers.forEach(layer => {
     output = kohonenConvolutionLayer(output, layer.filters, layer.step)
   })
 
-  return output
+  if (convertOutput) {
+    const lastLayerFiltersCount = layers[layers.length - 1].filters.length
+    return Array.apply(null, { length: lastLayerFiltersCount }).map((_, index) => output[0] === index ? 1 : 0)
+  } else {
+    return output
+  }
 }
