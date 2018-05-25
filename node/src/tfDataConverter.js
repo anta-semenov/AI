@@ -19,14 +19,14 @@ const unshiftKohonenInputData = (input, symbol, dataItem) => {
   ])
 }
 
-const getSymbolDayResult = (tomorrowOpen, open, low, high) => {
-  const openPercent = Math.abs(((tomorrowOpen - open) / open) * 100)
-  const lowPercent = Math.abs(((low - open) / open) * 100)
-  const highPercent = Math.abs(((high - open) / open) * 100)
+const getSymbolDayResult = (tomorrowOpen, open, low, high, vol) => {
+  const openDiff = Math.abs(tomorrowOpen - open)
+  const lowDropdown = Math.abs(low - open)
+  const highDropdown = Math.abs(high - open)
 
-  if (tomorrowOpen > open && openPercent > 2 && lowPercent < 10) {
+  if (tomorrowOpen > open && openDiff > 0.5 * vol && lowDropdown < vol) {
     return [1, 0]
-  } else if (tomorrowOpen < open && openPercent > 2 && highPercent < 10) {
+  } else if (tomorrowOpen < open && openDiff > 0.5 * vol && highDropdown < vol) {
     return [0, 1]
   } else {
     return [0, 0]
@@ -64,6 +64,7 @@ export const prepareTFData = (symbols, dayData, kohonenAbsoluteLayers, kohonenLo
           symbolDayData.open,
           symbolDayData.low,
           symbolDayData.high,
+          symbolDayData.avgVol,
         )
         dayResult.output.push(...symbolDayResult)
 

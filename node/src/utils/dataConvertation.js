@@ -59,7 +59,7 @@ const convertData = () => {
   }
 
   fs.writeFileSync(
-    path.resolve('../DataSet', `perDateData.json`),
+    path.resolve('../DataSet', 'perDateData.json'),
     JSON.stringify(perDateData)
   )
 
@@ -105,7 +105,7 @@ const processFile = symbol => {
   const filePath = path.resolve('../DataSetsRaw', `${symbol}.json`)
   const fileData = JSON.parse(fs.readFileSync(filePath))
 
-  const convertNumber = number => symbol !== 'JPY' ? number : number ? 1000/number : undefined
+  const convertNumber = number => symbol !== 'JPY' ? number : number ? Math.trunc(1000000000/number) / 1000 : undefined
 
   const tempData = fileData.dataset.data.map(rawDayData => {
     return ({
@@ -123,6 +123,7 @@ const processFile = symbol => {
   const last20High = []
   const learnData = []
   const testData = []
+  const volatility = []
 
   tempData.forEach((dayData, index, array) => {
     const open = dayData.open || array[index - 1].close
@@ -134,10 +135,12 @@ const processFile = symbol => {
     maxAbsolute = Math.max(maxAbsolute, high || 0)
     last20Low.push(low)
     last20High.push(high)
+    volatility.push(Math.abs(high - low))
 
     if (last20Low.length > INPUT_DEEP) {
       last20Low.shift()
       last20High.shift()
+      volatility.shift()
     }
 
     const dataForSet = ({
@@ -149,7 +152,8 @@ const processFile = symbol => {
       maxAbsolute,
       minAbsolute,
       maxLocal: last20High.reduce((res, item) => Math.max(res, item || 0), 0),
-      minLocal: last20Low.reduce((res, item) => Math.min(res, item || DEFAULT_MIN), DEFAULT_MIN)
+      minLocal: last20Low.reduce((res, item) => Math.min(res, item || DEFAULT_MIN), DEFAULT_MIN),
+      avgVol: Math.trunc(volatility.reduce((res, item) => res + item, 0) * 100000 / volatility.length) / 100000
     })
 
     if (dayData.date < dateFns.parse('2008-01-01').getTime()) {
