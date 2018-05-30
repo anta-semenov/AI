@@ -1,2 +1,4 @@
-node_modules
-lib
+node/node_modules
+node/lib
+.DS_Store
+tensorflow

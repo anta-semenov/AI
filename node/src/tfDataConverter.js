@@ -33,7 +33,7 @@ const getSymbolDayResult = (tomorrowOpen, open, low, high, vol) => {
   }
 }
 
-export const prepareTFData = (symbols, dayData, kohonenAbsoluteLayers, kohonenLocalLayers) => {
+export const prepareTFData = (symbols, dayData, kohonenAbsoluteLayers, kohonenLocalLayers, dataKey = 'learnData') => {
   const resultData = []
   const inputBuffer = {}
   symbols.forEach(symbol => {
@@ -43,7 +43,7 @@ export const prepareTFData = (symbols, dayData, kohonenAbsoluteLayers, kohonenLo
     }
   })
 
-  dayData.learnData.forEach((dataItem, index) => {
+  dayData[dataKey].forEach((dataItem, index) => {
     if (index <= INPUT_DEEP) {
       symbols.forEach(symbol => {
         unshiftKohonenInputData(inputBuffer, symbol, dataItem)

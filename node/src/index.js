@@ -99,8 +99,8 @@ const kohonenAbsoluteLayers = load('kohonenAbsoluteLayers')
 const kohonenLocalLayers = load('kohonenLocalLayers')
 const dayData = load('perDateData')
 
-const resultData = prepareTFData(symbols, dayData, kohonenAbsoluteLayers, kohonenLocalLayers)
+const resultData = prepareTFData(symbols, dayData, kohonenAbsoluteLayers, kohonenLocalLayers, 'testData')
 
-save('tfData', resultData)
+save('tfTestData', resultData)
 
 // {input: [[]]}
