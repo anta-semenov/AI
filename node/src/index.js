@@ -95,12 +95,15 @@ import {symbols} from './constants'
 // const absoluteLayers = kohonenNetStudy(learnDataAbsolute, layers)
 // save('kohonenAbsoluteLayers', absoluteLayers)
 
-const kohonenAbsoluteLayers = load('kohonenAbsoluteLayers')
-const kohonenLocalLayers = load('kohonenLocalLayers')
-const dayData = load('perDateData')
-
-const resultData = prepareTFData(symbols, dayData, kohonenAbsoluteLayers, kohonenLocalLayers, 'testData')
-
-save('tfTestData', resultData)
+// const kohonenAbsoluteLayers = load('kohonenAbsoluteLayers')
+// const kohonenLocalLayers = load('kohonenLocalLayers')
+// const dayData = load('perDateData')
+//
+// const resultData = prepareTFData(symbols, dayData, kohonenAbsoluteLayers, kohonenLocalLayers, 'testData')
+//
+// save('tfTestData', resultData)
 
 // {input: [[]]}
+
+const testData = load('tfData')
+console.log('++++++', testData[0].input.length);
