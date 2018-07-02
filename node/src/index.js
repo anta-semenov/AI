@@ -1,12 +1,13 @@
 import {load, save} from './utils/file'
 import {prepareTFData} from './tfDataConverter'
 import {symbols} from './constants'
+import {evaluateModel} from './evaluation'
 // import {evolutionStrategy} from './study/evolutionStrategy'
 // import {kohonenNetStudy} from './study/kohonenStudy'
 // import {mapMatrix} from './utils/mapMatrix'
 // import convertData from './utils/dataConvertation'
 
-// convertData()
+//convertData()
 
 // const data = load('data')
 
@@ -98,12 +99,13 @@ import {symbols} from './constants'
 // const kohonenAbsoluteLayers = load('kohonenAbsoluteLayers')
 // const kohonenLocalLayers = load('kohonenLocalLayers')
 // const dayData = load('perDateData')
-//
+// //
 // const resultData = prepareTFData(symbols, dayData, kohonenAbsoluteLayers, kohonenLocalLayers, 'testData')
 //
 // save('tfTestData', resultData)
 
 // {input: [[]]}
 
-const testData = load('tfData')
-console.log('++++++', testData[0].input.length);
+// const testData = load('tfData')
+// console.log('++++++', testData[0].input.length);
+// evaluateModel()

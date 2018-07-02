@@ -9,8 +9,8 @@ import json
 from keras.models import Sequential
 from keras.layers import LSTM, Lambda, Dense
 
-learnData = json.load(open('../DataSet/tfData.json'))
-testData = json.load(open('../DataSet/tfTestData.json'))
+learnData = json.load(open('./DataSet/tfData.json'))
+testData = json.load(open('./DataSet/tfTestData.json'))
 
 def loss(outputTrue, outputPredict):
     pprint('++++++++' + outputPredict)
@@ -43,7 +43,7 @@ model = Sequential([
 
 model.compile(optimizer='rmsprop', loss='mean_squared_error', metrics=['accuracy'])
 
-model.fit(np.array(trainInput)[0:1932], np.array(trainOutput)[0:1932], epochs=50, batch_size=21)
+model.fit(np.array(trainInput)[0:1932], np.array(trainOutput)[0:1932], epochs=100, batch_size=21)
 
 testInput = []
 testOutput = []

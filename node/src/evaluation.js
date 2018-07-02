@@ -1,31 +1,37 @@
 import {load} from './utils/file'
 import fs from 'fs'
 import {symbols} from './constants'
+import {INPUT_DEEP} from './constants'
+
+const leverage = 20
 
 const getDealResult = (amount, startPrice, closePrice, isSell = false) => {
   if (isSell) {
-    return amount * (1 - closePrice / startPrice)
+    return (amount * leverage) * (1 - closePrice / startPrice)
   } else {
-    return amount * (closePrice / startPrice - 1)
+    return (amount * leverage) * (closePrice / startPrice - 1)
   }
 }
 
 const getDealAmount = (deposit, avgVol, startPrice, numberOfDeals) => {
   const maxAmount = deposit / numberOfDeals
-  const volAmount = deposit * 0.1 * startPrice / (avgVol * 1.5)
+  const volAmount = deposit * 0.1 * startPrice / (avgVol * 1.2) / leverage
   return Math.min(maxAmount, volAmount)
 }
 
 export const evaluateModel = () => {
-  const predictions = JSON.parse(fs.readFileSync('./predictions.json'))
-  const dayData = load('perDateData').testData
+  const predictions = JSON.parse(fs.readFileSync('../predictions.json'))
+  const dayData = load('perDateData').testData.slice(INPUT_DEEP + 1, )
 
-  if (predictions.length !== dayData.length) {
-    throw Error('dayData and predictions lengths aren\'t equal')
+  if ((predictions.length + 1) !== dayData.length) {
+    throw Error(`dayData and predictions lengths aren\'t equal ${predictions.length}, ${dayData.length}`)
   }
 
   const startDeposit = 1000
   let deposit = startDeposit
+  let totalDeals = 0
+  let winDeals = 0
+  let loseDeals = 0
 
   predictions.forEach((predict, predictIndex) => {
     const numberOfDeals = predict.reduce((res, value) => value > 0.7 ? res + 1 : res, 0)
@@ -40,16 +46,28 @@ export const evaluateModel = () => {
       if (isBuy && isSell) {
         return
       } else if (isBuy) {
-        const stopPrice = symbolDayData.open - symbolDayData.avgVol * 1.5
-        const closePrice = stopPrice < symbolDayData.low ? symbolDayData.close : symbolDayData.low
+        totalDeals++
+        const stopPrice = symbolDayData.open - symbolDayData.avgVol * 1.2
+        const closePrice = stopPrice < symbolDayData.low ? symbolDayData.close : stopPrice
         const amount = getDealAmount(dayDeposit, symbolDayData.avgVol, symbolDayData.open, numberOfDeals)
-        deposit += getDealResult(amount, symbolDayData.open, closePrice)
+        const result = getDealResult(amount, symbolDayData.open, closePrice)
+        result > 0 ? loseDeals++ : winDeals++
+        deposit += result
       } else if (isSell) {
-        const stopPrice = symbolDayData.open + symbolDayData.avgVol * 1.5
-        const closePrice = stopPrice > symbolDayData.high ? symbolDayData.close : symbolDayData.high
+        totalDeals++
+        const stopPrice = symbolDayData.open + symbolDayData.avgVol * 1.2
+        const closePrice = stopPrice > symbolDayData.high ? symbolDayData.close : stopPrice
         const amount = getDealAmount(dayDeposit, symbolDayData.avgVol, symbolDayData.open, numberOfDeals)
-        deposit += getDealResult(amount, symbolDayData.open, closePrice, true)
+        const result = getDealResult(amount, symbolDayData.open, closePrice, true)
+        result > 0 ? loseDeals++ : winDeals++
+        deposit += result
       }
     })
   })
+
+  console.log('End of evaluation')
+  console.log(`depo: ${deposit}, %: ${deposit / startDeposit * 100}`)
+  console.log(`total: ${totalDeals}, win: ${winDeals}, lose: ${loseDeals}`);
 }
+
+evaluateModel()

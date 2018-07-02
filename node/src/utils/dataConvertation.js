@@ -10,7 +10,7 @@ let nullLowCount = 0
 
 const DEFAULT_MIN = 999999999999
 
-const convertData = () => {
+export const convertData = () => {
   const result = {
     learnData: {},
     testData: {}
@@ -168,5 +168,3 @@ const processFile = symbol => {
     testData
   })
 }
-
-export default convertData

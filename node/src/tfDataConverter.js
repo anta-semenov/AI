@@ -49,7 +49,7 @@ export const prepareTFData = (symbols, dayData, kohonenAbsoluteLayers, kohonenLo
         unshiftKohonenInputData(inputBuffer, symbol, dataItem)
       })
       return
-    } else if (index < dayData.learnData.length - 1) {
+    } else if (index < dayData[dataKey].length - 1) {
       const dayResult = {
         input: [],
         output: []
@@ -60,7 +60,7 @@ export const prepareTFData = (symbols, dayData, kohonenAbsoluteLayers, kohonenLo
         // берем текущие данные и результат за пред день и вычисляем выходы
         const symbolDayData = dataItem[symbol]
         const symbolDayResult = getSymbolDayResult(
-          dayData.learnData[index + 1][symbol].open,
+          dayData[dataKey][index + 1][symbol].open,
           symbolDayData.open,
           symbolDayData.low,
           symbolDayData.high,

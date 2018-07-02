@@ -8,7 +8,9 @@
     "test:watch": "jest --watch",
     "build": "babel src/ -d lib/",
     "clean": "rimraf ./lib",
-    "start": "npm run clean && npm run build && node ./lib/index.js"
+    "start": "npm run clean && npm run build && node ./lib/index.js",
+    "prepare": "node ./lib/prepareData.js",
+    "evaluate": "node ./lib/evaluation.js"
   },
   "author": "",
   "license": "MIT",
