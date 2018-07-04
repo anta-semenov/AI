@@ -52,6 +52,7 @@ export const evaluateModel = () => {
         const amount = getDealAmount(dayDeposit, symbolDayData.avgVol, symbolDayData.open, numberOfDeals)
         const result = getDealResult(amount, symbolDayData.open, closePrice)
         result > 0 ? loseDeals++ : winDeals++
+        console.log(`buy result: ${result}, depo: ${deposit}, symbol: ${symbol}, amount: ${amount}, openPrice: ${symbolDayData.open}, closePrice: ${symbolDayData.close}, stopPrice: ${stopPrice}, low: ${symbolDayData.low}, high: ${symbolDayData.high}`);
         deposit += result
       } else if (isSell) {
         totalDeals++
@@ -59,6 +60,7 @@ export const evaluateModel = () => {
         const closePrice = stopPrice > symbolDayData.high ? symbolDayData.close : stopPrice
         const amount = getDealAmount(dayDeposit, symbolDayData.avgVol, symbolDayData.open, numberOfDeals)
         const result = getDealResult(amount, symbolDayData.open, closePrice, true)
+        console.log(`sell result: ${result}, depo: ${deposit}, symbol: ${symbol}, amount: ${amount}, openPrice: ${symbolDayData.open}, closePrice: ${symbolDayData.close}, stopPrice: ${stopPrice}, low: ${symbolDayData.low}, high: ${symbolDayData.high}`);
         result > 0 ? loseDeals++ : winDeals++
         deposit += result
       }

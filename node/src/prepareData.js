@@ -30,17 +30,17 @@ symbols.forEach(symbol => {
 const layers = [
   {
     type: 'kohonen',
-    size: [10, 4, 4],
+    size: [6, 4, 4],
     step: 2
   },
   {
     type: 'kohonen',
-    size: [16, 4],
+    size: [10, 4],
     step: 2
   },
   {
     type: 'kohonen',
-    size: [20, 4],
+    size: [15, 4],
     step: 2
   }
 ]

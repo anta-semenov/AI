@@ -36,15 +36,13 @@ for dayData in learnData:
     trainOutput.append(dayData['output'])
 
 model = Sequential([
-    Dense(220, input_shape=(440,)),
-    Dense(110),
+    Dense(44, input_shape=(330,)),
     Dense(22)
 ])
 
 model.compile(optimizer='rmsprop', loss='mean_squared_error', metrics=['accuracy'])
 
 model.fit(np.array(trainInput)[0:1932], np.array(trainOutput)[0:1932], epochs=100, batch_size=21)
-
 testInput = []
 testOutput = []
 predictOutput = []
@@ -52,5 +50,5 @@ for dayData in testData:
     prediction = model.predict(np.array([dayData['input']]), batch_size=1)
     predictOutput.append(prediction.tolist()[0])
 
-with open('../predictions.json', 'w') as outfile:
+with open('./predictions.json', 'w') as outfile:
     json.dump(predictOutput, outfile)
