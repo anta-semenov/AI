@@ -35,24 +35,24 @@ for dayData in learnData:
     trainInput.append(dayData['input'])
     trainOutput.append(dayData['output'])
 
-# model = Sequential([
-#     Dense(44, input_shape=(330,)),
-#     Dense(22)
-# ])
-#
-# model.compile(optimizer='rmsprop', loss='mean_squared_error', metrics=['accuracy'])
-#
-# model.fit(np.array(trainInput)[0:1932], np.array(trainOutput)[0:1932], epochs=100, batch_size=21)
-#
-# np.save('./DataSet/keras_weights', model.get_weights())
-# with open('./DataSet/keras_config.json', 'w') as configFile:
-#     json.dump(model.get_config(), configFile)
+model = Sequential([
+    Dense(44, input_shape=(330,)),
+    Dense(22)
+])
 
-json_data=open('./DataSet/keras_config.json').read()
-modelConfig = json.loads(json_data)
-modelWeights = np.load('./DataSet/keras_weights')
-model = Sequential.from_config(modelConfig)
-model.set_weights(modelWeights)
+model.compile(optimizer='rmsprop', loss='mean_squared_error', metrics=['accuracy'])
+
+model.fit(np.array(trainInput)[0:1932], np.array(trainOutput)[0:1932], epochs=100, batch_size=21)
+
+np.save('./DataSet/keras_weights', model.get_weights())
+with open('./DataSet/keras_config.json', 'w') as configFile:
+    json.dump(model.get_config(), configFile)
+
+# json_data=open('./DataSet/keras_config.json').read()
+# modelConfig = json.loads(json_data)
+# modelWeights = np.load('./DataSet/keras_weights.npy')
+# model = Sequential.from_config(modelConfig)
+# model.set_weights(modelWeights)
 
 testInput = []
 testOutput = []

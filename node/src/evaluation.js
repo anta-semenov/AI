@@ -40,6 +40,9 @@ export const evaluateModel = () => {
   let totalDeals = 0
   let winDeals = 0
   let loseDeals = 0
+  let maxDepo = startDeposit
+  let minDropDownDepo = startDeposit
+  let maxDropDownPercent = 0
 
   predictions.forEach((predict, predictIndex) => {
     const numberOfDeals = predict.reduce((res, value) => value > 0.7 ? res + 1 : res, 0)
@@ -72,11 +75,22 @@ export const evaluateModel = () => {
         result > 0 ? loseDeals++ : winDeals++
         deposit += result
       }
+
+      if (deposit <= 0) {
+        throw Error('No money')
+      } else if (deposit > maxDepo) {
+        const dropDown = ((maxDepo - minDropDownDepo) * 100 / maxDepo).toFixed(2)
+        maxDropDownPercent = Math.max(dropDown, maxDropDownPercent)
+        maxDepo = deposit
+        minDropDownDepo = deposit
+      } else {
+        minDropDownDepo = Math.min(minDropDownDepo, deposit)
+      }
     })
   })
 
   console.log('End of evaluation')
-  console.log(`depo: ${deposit}, %: ${deposit / startDeposit * 100}`)
+  console.log(`depo: ${deposit}, %: ${deposit / startDeposit * 100}, maxDropDown: ${maxDropDownPercent}`)
   console.log(`total: ${totalDeals}, win: ${winDeals}, lose: ${loseDeals}`);
 }
 
