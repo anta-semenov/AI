@@ -10,6 +10,8 @@
     "clean": "rimraf ./lib",
     "start": "npm run clean && npm run build && node ./lib/index.js",
     "prepare": "node ./lib/prepareData.js",
+    "prepareTf": "node ./lib/prepareTFData.js",
+    "kohonen": "node ./lib/studyKohonen.js",
     "evaluate": "node ./lib/evaluation.js"
   },
   "author": "",

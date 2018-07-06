@@ -19,12 +19,20 @@ const getDealAmount = (deposit, avgVol, startPrice, numberOfDeals) => {
   return Math.min(maxAmount, volAmount)
 }
 
+const logDeal = (result, deposit, amount, symbolDayData, stopPrice, symbol, closePrice, type) => {
+  const date = new Date(symbolDayData.date)
+  const volatilityRate = ((symbolDayData.high - symbolDayData.low) / symbolDayData.avgVol).toFixed(2)
+  const resultRate = (result * 100 / deposit).toFixed(0)
+  // console.log(`${type} result: ${Math.trunc(result)}, depo: ${Math.trunc(deposit)}, symbol: ${symbol}, amount: ${Math.trunc(amount)}, openPrice: ${symbolDayData.open}, closePrice: ${symbolDayData.close}, stopPrice: ${stopPrice}, low: ${symbolDayData.low}, high: ${symbolDayData.high}`)
+  // console.log(`${type} result: ${Math.trunc(result)}, depo: ${Math.trunc(deposit)}, symbol: ${symbol}, resultRate: ${resultRate}, volRate: ${volatilityRate}, date: ${date}, amount: ${Math.trunc(amount)}, openPrice: ${symbolDayData.open}, closePrice: ${closePrice}, stopPrice: ${stopPrice}`)
+}
+
 export const evaluateModel = () => {
   const predictions = JSON.parse(fs.readFileSync('../predictions.json'))
   const dayData = load('perDateData').testData.slice(INPUT_DEEP + 1, )
 
   if ((predictions.length + 1) !== dayData.length) {
-    throw Error(`dayData and predictions lengths aren\'t equal ${predictions.length}, ${dayData.length}`)
+    throw Error(`dayData and predictions lengths aren't equal ${predictions.length}, ${dayData.length}`)
   }
 
   const startDeposit = 1000
@@ -52,7 +60,7 @@ export const evaluateModel = () => {
         const amount = getDealAmount(dayDeposit, symbolDayData.avgVol, symbolDayData.open, numberOfDeals)
         const result = getDealResult(amount, symbolDayData.open, closePrice)
         result > 0 ? loseDeals++ : winDeals++
-        console.log(`buy result: ${result}, depo: ${deposit}, symbol: ${symbol}, amount: ${amount}, openPrice: ${symbolDayData.open}, closePrice: ${symbolDayData.close}, stopPrice: ${stopPrice}, low: ${symbolDayData.low}, high: ${symbolDayData.high}`);
+        logDeal(result, deposit, amount, symbolDayData, stopPrice, symbol, closePrice, 'buy')
         deposit += result
       } else if (isSell) {
         totalDeals++
@@ -60,7 +68,7 @@ export const evaluateModel = () => {
         const closePrice = stopPrice > symbolDayData.high ? symbolDayData.close : stopPrice
         const amount = getDealAmount(dayDeposit, symbolDayData.avgVol, symbolDayData.open, numberOfDeals)
         const result = getDealResult(amount, symbolDayData.open, closePrice, true)
-        console.log(`sell result: ${result}, depo: ${deposit}, symbol: ${symbol}, amount: ${amount}, openPrice: ${symbolDayData.open}, closePrice: ${symbolDayData.close}, stopPrice: ${stopPrice}, low: ${symbolDayData.low}, high: ${symbolDayData.high}`);
+        logDeal(result, deposit, amount, symbolDayData, stopPrice, symbol, closePrice, 'sell')
         result > 0 ? loseDeals++ : winDeals++
         deposit += result
       }
