@@ -27,6 +27,15 @@ const logDeal = (result, deposit, amount, symbolDayData, stopPrice, symbol, clos
   // console.log(`${type} result: ${Math.trunc(result)}, depo: ${Math.trunc(deposit)}, symbol: ${symbol}, resultRate: ${resultRate}, volRate: ${volatilityRate}, date: ${date}, amount: ${Math.trunc(amount)}, openPrice: ${symbolDayData.open}, closePrice: ${closePrice}, stopPrice: ${stopPrice}`)
 }
 
+const writeChartData = (chartData) => {
+  let fileContent = 'window.dataSource = [\n'
+  chartData.forEach((item) => {
+    fileContent = `${fileContent}${JSON.stringify(item)},\n`
+  })
+  fileContent = `${fileContent}]`
+  fs.writeFileSync('./graph/data.js', fileContent)
+}
+
 export const evaluateModel = () => {
   const predictions = JSON.parse(fs.readFileSync('../predictions.json'))
   const dayData = load('perDateData').testData.slice(INPUT_DEEP + 1, )
@@ -43,6 +52,10 @@ export const evaluateModel = () => {
   let maxDepo = startDeposit
   let minDropDownDepo = startDeposit
   let maxDropDownPercent = 0
+  const chartData = [
+    ['Deal', 'Deposit'],
+    [`${totalDeals}`, deposit],
+  ]
 
   predictions.forEach((predict, predictIndex) => {
     const numberOfDeals = predict.reduce((res, value) => value > 0.7 ? res + 1 : res, 0)
@@ -65,6 +78,7 @@ export const evaluateModel = () => {
         result > 0 ? loseDeals++ : winDeals++
         logDeal(result, deposit, amount, symbolDayData, stopPrice, symbol, closePrice, 'buy')
         deposit += result
+        chartData.push([`${totalDeals}`, deposit])
       } else if (isSell) {
         totalDeals++
         const stopPrice = symbolDayData.open + symbolDayData.avgVol * 1.2
@@ -74,6 +88,7 @@ export const evaluateModel = () => {
         logDeal(result, deposit, amount, symbolDayData, stopPrice, symbol, closePrice, 'sell')
         result > 0 ? loseDeals++ : winDeals++
         deposit += result
+        chartData.push([`${totalDeals}`, deposit])
       }
 
       if (deposit <= 0) {
@@ -92,6 +107,7 @@ export const evaluateModel = () => {
   console.log('End of evaluation')
   console.log(`depo: ${deposit}, %: ${deposit / startDeposit * 100}, maxDropDown: ${maxDropDownPercent}`)
   console.log(`total: ${totalDeals}, win: ${winDeals}, lose: ${loseDeals}`);
+  writeChartData(chartData)
 }
 
 evaluateModel()
