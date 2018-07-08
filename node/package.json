@@ -9,7 +9,7 @@
     "build": "babel src/ -d lib/",
     "clean": "rimraf ./lib",
     "start": "npm run clean && npm run build && node ./lib/index.js",
-    "prepare": "node ./lib/prepareData.js",
+    "prepareData": "node ./lib/prepareData.js",
     "prepareTf": "node ./lib/prepareTFData.js",
     "kohonen": "node ./lib/studyKohonen.js",
     "evaluate": "node ./lib/evaluation.js"
@@ -18,7 +18,8 @@
   "license": "MIT",
   "dependencies": {
     "date-fns": "^1.29.0",
-    "mathjs": "^3.16.5"
+    "mathjs": "^3.16.5",
+    "node-fetch": "^2.1.2"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",

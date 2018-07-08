@@ -1,6 +1,7 @@
 const fs = require('fs')
 const path = require('path')
 const https = require('https')
+const fetch = require('node-fetch')
 
 const request = (tag, page) => new Promise(resolve => {
   const request = https.request({

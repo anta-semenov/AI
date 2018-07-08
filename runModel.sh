@@ -13,7 +13,7 @@ cd ..
 
 if [ "$stage" == "0" ] || [ "$stage" == "1" ]; then
   cd node
-  yarn prepare
+  yarn prepareData
   cd ..
 fi
 
