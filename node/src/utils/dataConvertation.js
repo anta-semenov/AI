@@ -1,7 +1,7 @@
 import fs from 'fs'
 import path from 'path'
 import dateFns from 'date-fns'
-import {symbols, INPUT_DEEP} from '../constants'
+import {symbols, INPUT_DEEP, symbolSpecs} from '../constants'
 
 let nullOpenCount = 0
 let nullCloseCount = 0
@@ -101,11 +101,11 @@ export const convertData = () => {
   console.log('==============================')
 }
 
-const processFile = symbol => {
+const processFile = (symbol) => {
   const filePath = path.resolve('../DataSetsRaw', `${symbol}.json`)
   const fileData = JSON.parse(fs.readFileSync(filePath))
 
-  const convertNumber = number => symbol !== 'JPY' ? number : number ? Math.trunc(1000000000/number) / 1000 : undefined
+  const convertNumber = symbolSpecs[symbol].processingValue
 
   const tempData = fileData.dataset.data.map(rawDayData => {
     return ({

@@ -1,4 +1,4 @@
-export const symbols = ['AUD', 'EUR', 'GBP', 'CHF', 'CAD', 'JPY', 'Brent', 'Gold', 'Wheat', 'Soybean']
+export const symbols = ['AUD', 'EUR', 'GBP', 'CHF', 'CAD', 'JPY', 'Brent', 'Gold', 'Wheat', 'Soybean', 'XOM']
 export const points = {
   AUD: 1000,
   EUR: 1000,
@@ -17,7 +17,7 @@ export const INPUT_DEEP = 22
 export const NUMBER_OF_LOCAL_SECTORS = 15
 export const NUMBER_OF_ABSOULTE_SECTORS = 15
 
-export const urls = {
+export const symbolSpecs = {
   AUD: {
     provider: 'quandl',
     id: 'CME_AD1',

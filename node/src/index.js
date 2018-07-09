@@ -1,12 +1,14 @@
-import {load, save} from './utils/file'
-import {prepareTFData} from './tfDataConverter'
-import {symbols} from './constants'
-import {evaluateModel} from './evaluation'
+// import {load, save} from './utils/file'
+// import {prepareTFData} from './tfDataConverter'
+// import {symbols} from './constants'
+// import {evaluateModel} from './evaluation'
+import {getAlphavantageData} from './utils/alphavantageRequest'
 // import {evolutionStrategy} from './study/evolutionStrategy'
 // import {kohonenNetStudy} from './study/kohonenStudy'
 // import {mapMatrix} from './utils/mapMatrix'
 // import convertData from './utils/dataConvertation'
 
+getAlphavantageData('XOM', undefined, undefined, '../DataSetsRaw/XOM.json')
 //convertData()
 
 // const data = load('data')
