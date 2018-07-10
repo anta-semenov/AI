@@ -2,13 +2,16 @@
 // import {prepareTFData} from './tfDataConverter'
 // import {symbols} from './constants'
 // import {evaluateModel} from './evaluation'
-import {getAlphavantageData} from './utils/alphavantageRequest'
+// import {getAlphavantageData} from './utils/alphavantageRequest'
 // import {evolutionStrategy} from './study/evolutionStrategy'
 // import {kohonenNetStudy} from './study/kohonenStudy'
 // import {mapMatrix} from './utils/mapMatrix'
 // import convertData from './utils/dataConvertation'
+import {donwloadOperatingData} from './utils/downloadDayData'
 
-getAlphavantageData('XOM', undefined, undefined, '../DataSetsRaw/XOM.json')
+donwloadOperatingData()
+
+// getAlphavantageData('XOM', undefined, undefined, '../DataSetsRaw/XOM.json')
 //convertData()
 
 // const data = load('data')
