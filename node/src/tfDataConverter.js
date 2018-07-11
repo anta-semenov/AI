@@ -44,7 +44,7 @@ export const prepareTFData = (symbols, dayData, kohonenAbsoluteLayers, kohonenLo
   })
 
   dayData[dataKey].forEach((dataItem, index) => {
-    if (index <= INPUT_DEEP) {
+    if (index < INPUT_DEEP) {
       symbols.forEach(symbol => {
         unshiftKohonenInputData(inputBuffer, symbol, dataItem)
       })
@@ -71,6 +71,7 @@ export const prepareTFData = (symbols, dayData, kohonenAbsoluteLayers, kohonenLo
         // Calculate result per symbols
         // run kohonenNet для каждого символа для local и absolute
         // и добовляем inputs результата
+        // console.log('++++', inputBuffer[symbol].local.length);
         const localTFInputs = kohonenNet(inputBuffer[symbol].local, kohonenLocalLayers, true)
         const absoluteTFInputs = kohonenNet(inputBuffer[symbol].absolute, kohonenAbsoluteLayers, true)
         dayResult.input = [...dayResult.input, ...localTFInputs, ...absoluteTFInputs]

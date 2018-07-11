@@ -41,7 +41,7 @@ const writeChartData = (chartData) => {
 
 export const evaluateModel = () => {
   const predictions = JSON.parse(fs.readFileSync('../predictions.json'))
-  const dayData = load('perDateData').testData.slice(INPUT_DEEP + 1, )
+  const dayData = load('perDateData').testData.slice(INPUT_DEEP, )
 
   if ((predictions.length + 1) !== dayData.length) {
     throw Error(`dayData and predictions lengths aren't equal ${predictions.length}, ${dayData.length}`)

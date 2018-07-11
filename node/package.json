@@ -12,7 +12,9 @@
     "prepareData": "node ./lib/prepareData.js",
     "prepareTf": "node ./lib/prepareTFData.js",
     "kohonen": "node ./lib/studyKohonen.js",
-    "evaluate": "node ./lib/evaluation.js"
+    "evaluate": "node ./lib/evaluation.js",
+    "prepareOperatingKohonen": "node ./lib/operation/downloadDayData.js && node ./lib/operation/prepareKohonenData.js",
+    "describePedictions": "node ./lib/operation/describePrediction.js"
   },
   "author": "",
   "license": "MIT",

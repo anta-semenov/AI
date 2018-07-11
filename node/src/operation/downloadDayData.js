@@ -1,6 +1,6 @@
 import {symbolSpecs, symbols, INPUT_DEEP} from '../constants'
-import {getQuandlData} from './quandlRequests'
-import {getAlphavantageData} from './alphavantageRequest'
+import {getQuandlData} from '../utils/quandlRequests'
+import {getAlphavantageData} from '../utils/alphavantageRequest'
 import fs from 'fs'
 import dateFns from 'date-fns'
 
@@ -92,6 +92,8 @@ const donwloadNextSymbol = (index) => {
   }
 }
 
-export const donwloadOperatingData = () => {
-  donwloadNextSymbol(0)
-}
+// export const donwloadOperatingData = () => {
+//   donwloadNextSymbol(0)
+// }
+
+donwloadNextSymbol(0)
