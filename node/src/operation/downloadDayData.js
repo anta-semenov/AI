@@ -21,7 +21,7 @@ const downloadSymbolData = (symbol, symbolSpec, date) => {
     storedData = JSON.parse(fs.readFileSync(symbolFileName))
   }
 
-  if (storedData.lastDate === date.getTime()) {
+  if (storedData.lastDate >= date.getTime()) {
     return Promise.resolve()
   }
 
