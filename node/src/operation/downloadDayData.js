@@ -21,6 +21,10 @@ const downloadSymbolData = (symbol, symbolSpec, date) => {
     storedData = JSON.parse(fs.readFileSync(symbolFileName))
   }
 
+  if (storedData.lastDate === date.getTime()) {
+    return Promise.resolve()
+  }
+
   let requestPromise
   if (symbolSpec.provider === 'quandl') {
     requestPromise = getQuandlData
