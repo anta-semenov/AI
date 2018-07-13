@@ -6,7 +6,8 @@ const leverage = 20
 const getDealAmount = (deposit, avgVol, startPrice, numberOfDeals) => {
   const maxAmount = deposit / numberOfDeals
   const volAmount = deposit * 0.1 * startPrice / (avgVol * 1.2) / leverage
-  return Math.min(maxAmount, volAmount)
+  const amount = Math.min(maxAmount, volAmount)
+  return 50 * Math.trunc(amount / 50)
 }
 
 const describePrediction = (args) => {
