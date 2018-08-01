@@ -3,6 +3,9 @@ from __future__ import division
 from __future__ import print_function
 from pprint import pprint
 import numpy as np
+import pickle
+import StringIO
+import boto3
 
 import json
 
@@ -48,9 +51,18 @@ for dayData in learnData:
 # with open('./DataSet/keras_config.json', 'w') as configFile:
 #     json.dump(model.get_config(), configFile)
 
+s3 = boto3.client(
+    's3',
+    aws_access_key_id='',
+    aws_secret_access_key='',
+    region_name='us-east-2'
+)
+data = StringIO.StringIO()
+s3.download_fileobj('antonsemenov-ai-files', 'keras-weights', data)
+
 json_data=open('./DataSet/keras_config.json').read()
 modelConfig = json.loads(json_data)
-modelWeights = np.load('./DataSet/keras_weights.npy')
+modelWeights = pickle.loads(data.getvalue()) # np.load('./DataSet/keras_weights.npy')
 model = Sequential.from_config(modelConfig)
 model.set_weights(modelWeights)
 
@@ -63,3 +75,9 @@ for dayData in testData:
 
 with open('./predictions.json', 'w') as outfile:
     json.dump(predictOutput, outfile)
+
+# with open('./temp', 'w') as outfile:
+#     pickle.dump(model.get_weights(), outfile)
+#
+# with open('./temp', 'rb') as data:
+#     s3.upload_fileobj(data, 'antonsemenov-ai-files', 'keras-weights')

@@ -2,3 +2,5 @@ node/node_modules
 node/lib
 .DS_Store
 tensorflow
+.env
+node_modules
