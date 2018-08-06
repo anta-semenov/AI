@@ -1,0 +1,27 @@
+{
+  "name": "lambda-node",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.10",
+    "@types/aws-sdk": "^2.7.0",
+    "babel-plugin-transform-es2015-modules-commonjs": "^6.26.2",
+    "serverless": "^1.29.2",
+    "serverless-webpack": "^5.2.0",
+    "ts-loader": "^4.4.2",
+    "tslint": "^5.11.0",
+    "typescript": "^3.0.1",
+    "webpack": "^4.16.4",
+    "webpack-async-await": "^1.1.0",
+    "webpack-node-externals": "^1.7.2"
+  },
+  "dependencies": {
+    "date-fns": "^1.29.0"
+  }
+}

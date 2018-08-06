@@ -1,18 +1,11 @@
-
-service: lambda-python
+service: prediction
 
 plugins:
-  - serverless-python-requirements
-
-custom:
-  pythonRequirements:
-    dockerizePip: non-linux
-    slim: true
-    zip: true
+  - serverless-webpack
 
 provider:
   name: aws
-  runtime: python2.7
+  runtime: nodejs6.10
 
   stage: dev
   region: us-east-2
@@ -23,5 +16,10 @@ provider:
     AWS_SECRET_ACCESS_KEY: ${ssm:secretAccessKey}
 
 functions:
-  keras:
-    handler: handler.keras
+  predict:
+    handler: handler.predict
+    events:
+      -http:
+        method: post
+        cors: true
+        path: predict

@@ -60,8 +60,11 @@ s3 = boto3.client(
 data = StringIO.StringIO()
 s3.download_fileobj('antonsemenov-ai-files', 'keras-weights', data)
 
+config = StringIO.StringIO()
+s3.download_fileobj('antonsemenov-ai-files', 'keras_config.json', config)
+
 json_data=open('./DataSet/keras_config.json').read()
-modelConfig = json.loads(json_data)
+modelConfig = json.loads(config.getvalue()) # json.loads(json_data)
 modelWeights = pickle.loads(data.getvalue()) # np.load('./DataSet/keras_weights.npy')
 model = Sequential.from_config(modelConfig)
 model.set_weights(modelWeights)
