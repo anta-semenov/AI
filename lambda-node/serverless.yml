@@ -9,6 +9,7 @@ provider:
 
   stage: dev
   region: us-east-2
+  profile: aiProfile
 
   environment:
     AWS_DEFAULT_REGION: ${ssm:boto3DefaultRegion}
