@@ -16,6 +16,7 @@ var/
 .installed.cfg
 *.egg
 .requirements.zip
+vendored
 
 # Serverless directories
 .serverless

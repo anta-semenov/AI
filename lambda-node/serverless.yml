@@ -3,24 +3,45 @@ service: prediction
 plugins:
   - serverless-webpack
 
+custom:
+  webpackIncludeModules:
+    forceExclude:
+        - aws-sdk
+
 provider:
   name: aws
-  runtime: nodejs6.10
+  runtime: nodejs8.10
+  memorySize: 512
 
   stage: dev
   region: us-east-2
   profile: aiProfile
 
-  environment:
-    AWS_DEFAULT_REGION: ${ssm:boto3DefaultRegion}
-    AWS_ACCESS_KEY_ID: ${ssm:accessKeyId}
-    AWS_SECRET_ACCESS_KEY: ${ssm:secretAccessKey}
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - s3:GetObject
+      Resource: "arn:aws:s3:::antonsemenov-ai-files/*"
+    - Effect: Allow
+      Action:
+        - s3:PutObject
+      Resource: "arn:aws:s3:::antonsemenov-ai-files/*"
+    - Effect: Allow
+      Action:
+        - lambda:InvokeFunction
+        - lambda:InvokeAsync
+      Resource: "*"
+
+  # environment:
+  #   AWS_DEFAULT_REGION: ${ssm:boto3DefaultRegion}
+  #   AWS_ACCESS_KEY_ID: ${ssm:accessKeyId}
+  #   AWS_SECRET_ACCESS_KEY: ${ssm:secretAccessKey}
 
 functions:
   predict:
     handler: handler.predict
     events:
-      -http:
-        method: post
-        cors: true
-        path: predict
+      - http:
+          method: post
+          cors: true
+          path: predict

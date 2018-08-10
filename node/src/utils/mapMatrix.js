@@ -1,4 +1,4 @@
-import math from 'mathjs'
+const math = require('mathjs')
 import {subrange} from './subrange'
 import {increaseIndex} from './increaseIndex'
 

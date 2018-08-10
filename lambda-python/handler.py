@@ -1,17 +1,15 @@
-try:
-  import unzip_requirements
-except ImportError:
-  pass
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
+import os
+import sys
 import json
 import boto3
-import numpy as np
 import pickle
 import StringIO
-import boto3
+HERE = os.path.dirname(os.path.realpath(__file__))
+sys.path.append(os.path.join(HERE, "vendored"))
 
+import numpy as np
+from keras.models import Sequential
+from keras.layers import LSTM, Lambda, Dense
 
 
 def keras(event, context):
@@ -26,10 +24,10 @@ def keras(event, context):
     model = Sequential.from_config(modelConfig)
     model.set_weights(modelWeights)
 
-    kohonen = StringIO.StringIO()
-    s3.download_fileobj('antonsemenov-ai-files', 'kohonen-result.json', kohonen)
+    # kohonen = StringIO.StringIO()
+    # s3.download_fileobj('antonsemenov-ai-files', 'kohonen-result.json', kohonen)
 
-    prediction = model.predict(np.array([json.load(kohonen)]), batch_size=1)
+    prediction = model.predict(np.array([event]), batch_size=1)
 
     return {
         "result": json.dumps(prediction.tolist()[0]),

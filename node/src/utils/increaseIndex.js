@@ -1,6 +1,6 @@
-export const increaseIndex = (index: number[], indexSize: number[], step: number, endOffset: number[] = []): number[] => {
+export const increaseIndex = (index, indexSize, step, endOffset = []) => {
   let i = index.length
-  const newIndex: number[] = []
+  const newIndex = []
   let wasIncreased = false
 
   while (i) {

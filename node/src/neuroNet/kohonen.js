@@ -1,4 +1,4 @@
-import math from 'mathjs'
+const math = require('mathjs')
 import {mapMatrix} from '../utils/mapMatrix'
 
 export const getDistance = (input, weigths) => weigths.reduce((res, weight, index) => {

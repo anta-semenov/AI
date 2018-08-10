@@ -12,6 +12,7 @@
   "devDependencies": {
     "@types/aws-lambda": "^8.10.10",
     "@types/aws-sdk": "^2.7.0",
+    "aws-sdk": "^2.290.0",
     "babel-plugin-transform-es2015-modules-commonjs": "^6.26.2",
     "serverless": "^1.29.2",
     "serverless-webpack": "^5.2.0",
@@ -23,6 +24,7 @@
     "webpack-node-externals": "^1.7.2"
   },
   "dependencies": {
-    "date-fns": "^1.29.0"
+    "date-fns": "^1.29.0",
+    "mathjs": "^5.0.4"
   }
 }

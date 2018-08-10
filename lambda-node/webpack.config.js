@@ -13,10 +13,10 @@ module.exports = {
   target: "node",
   externals: [nodeExternals()],
   module: {
-    loaders: [
+    rules: [
       {
-        test: /\.ts(x?)$/,
-        loader: "ts-loader",
+        test: /\.ts(x?)$|\.js$/,
+        use: "ts-loader",
         exclude: [/\.(spec|e2e)\.ts$/],
       },
     ],

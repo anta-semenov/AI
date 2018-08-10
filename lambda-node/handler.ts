@@ -1,9 +1,9 @@
-import AWS from 'aws-sdk'
+import * as AWS from 'aws-sdk'
 import { Callback } from 'aws-lambda'
 import { kohonenNet } from '../node/src/neuroNet/kohonen'
-import dateFns from 'date-fns'
+import * as dateFns from 'date-fns'
 
-const symbols = ['AUD', 'EUR', 'GBP', 'CHF', 'CAD', 'JPY', 'Brent', 'Gold', 'Wheat', 'Soybean', 'XOM']
+// const symbols = ['AUD', 'EUR', 'GBP', 'CHF', 'CAD', 'JPY', 'Brent', 'Gold', 'Wheat', 'Soybean', 'XOM']
 const INPUT_DEEP = 22
 const DEFAULT_MIN = 999999999999
 
@@ -56,14 +56,26 @@ interface SymbolData {
   dayData: DayData[]
 }
 
-const getS3Data = (bucket: string, key: string): Promise<any> => {
+enum Deal {
+  nothing = 'nothing',
+  buy = 'buy',
+  sell = 'sell',
+}
+
+interface SymbolResult {
+  deal: Deal
+  sl?: number
+  numberOfDeals?: number
+}
+
+function getS3Data(bucket: string, key: string): Promise<any> {
   const s3 = new AWS.S3()
   return s3.getObject({ Bucket: bucket, Key: key })
     .promise()
     .then((data) => JSON.parse(data.Body))
 }
 
-const putS3Data = (bucket: string, key: string, object: any): Promise<void> => {
+function putS3Data(bucket: string, key: string, object: any): Promise<void> {
   const s3 = new AWS.S3()
   return s3.putObject({
     Bucket: bucket,
@@ -74,15 +86,18 @@ const putS3Data = (bucket: string, key: string, object: any): Promise<void> => {
     .then(() => {})
 }
 
-const normalize = (value: number, min: number, max: number): number => (value - min) / (max - min)
+function normalize(value: number, min: number, max: number): number {
+  return (value - min) / (max - min)
+}
 
 export async function predict(event: InputPayload, _: any, callback: Callback) {
   const symbolsData = await getS3Data('antonsemenov-ai-files', 'symbolsData.json') as { [symbol: string]: SymbolData }
   Object.values(Symbol).forEach((symbol: string) => {
     const symbolData = symbolsData[symbol]
     const input = event[symbol]
-    const inputDate = dateFns.startOfDay(dateFns.parse(input.date)).getTime()
-    if (symbolData.lastDate < inputDate) {
+    const inputDate = dateFns.parse(input.date).getTime()
+
+    if (Number(symbolData.lastDate) < inputDate) {
       symbolData.lastDate = inputDate
 
       symbolData.maxAbsolute = Math.max(symbolData.maxAbsolute, input.high)
@@ -127,7 +142,7 @@ export async function predict(event: InputPayload, _: any, callback: Callback) {
   Object.values(Symbol).forEach((symbol: string) => {
     const symbolData = symbolsData[symbol]
     if (symbolData.dayData.length !== INPUT_DEEP) {
-      throw Error(`Day data size of ${symbol} not equal input size`)
+      callback(Error(`Day data size of ${symbol} not equal input size`), null)
     }
 
     const kohonenInputLocal = symbolData.dayData.map(({open, close, high, low, minLocal, maxLocal}) => {
@@ -153,7 +168,7 @@ export async function predict(event: InputPayload, _: any, callback: Callback) {
     kohonenResult = [...kohonenResult, ...localTFInputs, ...absoluteTFInputs]
   })
 
-  await putS3Data('antonsemenov-ai-files', 'kohonen-result.json', kohonenResult)
+  await putS3Data('antonsemenov-ai-files', 'kohonen-result.json', JSON.stringify(kohonenResult))
 
 
   // calling python
@@ -161,24 +176,37 @@ export async function predict(event: InputPayload, _: any, callback: Callback) {
   const params = {
     FunctionName : 'lambda-python-dev-keras',
     InvocationType : 'RequestResponse',
+    Payload: JSON.stringify(kohonenResult)
   }
   const pythonResponse = await lambda.invoke(params).promise()
   if (!(pythonResponse.Payload && typeof pythonResponse.Payload === 'string')) {
-    return Promise.reject('Invalid response from our own backend')
+    callback(Error('Wrong keras prediction'), null)
   }
 
-  const predictions = JSON.parse(pythonResponse.Payload) as number[]
+  const predictions = JSON.parse(JSON.parse(pythonResponse.Payload).result) as number[]
   const numberOfDeals = predictions.reduce((res, value) => value > 0.7 ? res + 1 : res, 0)
 
+  const result: { [symbol: string]: SymbolResult } = {}
+  Object.values(Symbol).forEach((symbol: string, symbolIndex: number) => {
+    const isBuy = predictions[symbolIndex * 2] > 0.7
+    const isSell = predictions[symbolIndex * 2 + 1] > 0.7
 
+    const dayData = symbolsData[symbol].dayData[0]
 
+    if (isBuy && isSell) {
+      result[symbol] = { deal: Deal.nothing }
+    } else if (isBuy) {
+      result[symbol] = { deal: Deal.buy, sl: dayData.avgVol * 1.2, numberOfDeals }
+    } else if (isSell) {
+      result[symbol] = { deal: Deal.sell, sl: dayData.avgVol * 1.2, numberOfDeals }
+    } else {
+      result[symbol] = { deal: Deal.nothing }
+    }
+  })
 
   const response = {
     statusCode: 200,
-    body: JSON.stringify({
-      message: 'Go Serverless v1.0! Your function executed successfully!',
-      input: event,
-    }),
+    body: JSON.stringify(result),
   }
 
   callback(null, response)

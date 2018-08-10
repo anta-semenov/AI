@@ -1,6 +1,6 @@
-import math from 'mathjs'
+const math = require('mathjs')
 
-export const subrange = (matrix, startIndex: number[], endIndex: number[]) => {
+export const subrange = (matrix, startIndex, endIndex) => {
   if (startIndex.length !== endIndex.length) {
     throw new Error('Start and End indexes have different dimensions')
   }
