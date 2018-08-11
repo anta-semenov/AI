@@ -29,6 +29,20 @@ enum Symbol {
   XOM = 'XOM',
 }
 
+const fxProSymbolMap: { [symbol: string]: string } = {
+  AUD: 'AUDUSD',
+  EUR: 'EURUSD',
+  GBP: 'GBPUSD',
+  CHF: 'USDCHF',
+  CAD: 'USDCAD',
+  JPY: 'USDJPY',
+  Brent: 'BRENT',
+  Gold: 'GOLD',
+  Wheat: '#Wheat_U8',
+  Soybean: '#Soybean_U8',
+  XOM: '#ExxonMobil',
+}
+
 interface InputPayload {
   [symbol: string]: Price;
 }
@@ -90,11 +104,12 @@ function normalize(value: number, min: number, max: number): number {
   return (value - min) / (max - min)
 }
 
-export async function predict(event: InputPayload, _: any, callback: Callback) {
+export async function predict(event: any, _: any, callback: Callback) {
+  const body: InputPayload = JSON.parse((event.body as string).replace('\u0000', ''))
   const symbolsData = await getS3Data('antonsemenov-ai-files', 'symbolsData.json') as { [symbol: string]: SymbolData }
   Object.values(Symbol).forEach((symbol: string) => {
     const symbolData = symbolsData[symbol]
-    const input = event[symbol]
+    const input = body[fxProSymbolMap[symbol]]
     const inputDate = dateFns.parse(input.date).getTime()
 
     if (Number(symbolData.lastDate) < inputDate) {
@@ -107,9 +122,9 @@ export async function predict(event: InputPayload, _: any, callback: Callback) {
       symbolData.volatility.unshift(Math.abs(input.high - input.low))
 
       if (symbolData.last20Low.length > INPUT_DEEP) {
-        symbolData.last20Low.pop()
-        symbolData.last20High.pop()
-        symbolData.volatility.pop()
+        symbolData.last20Low = symbolData.last20Low.slice(0, INPUT_DEEP)
+        symbolData.last20High = symbolData.last20High.slice(0, INPUT_DEEP)
+        symbolData.volatility = symbolData.last20High.slice(0, INPUT_DEEP)
       }
 
       const dataForSet = ({
@@ -127,7 +142,7 @@ export async function predict(event: InputPayload, _: any, callback: Callback) {
 
       symbolData.dayData.unshift(dataForSet)
       if (symbolData.dayData.length > INPUT_DEEP) {
-        symbolData.dayData.pop()
+        symbolData.dayData = symbolData.dayData.slice(0, INPUT_DEEP)
       }
     }
   })
@@ -194,13 +209,13 @@ export async function predict(event: InputPayload, _: any, callback: Callback) {
     const dayData = symbolsData[symbol].dayData[0]
 
     if (isBuy && isSell) {
-      result[symbol] = { deal: Deal.nothing }
+      result[fxProSymbolMap[symbol]] = { deal: Deal.nothing }
     } else if (isBuy) {
-      result[symbol] = { deal: Deal.buy, sl: dayData.avgVol * 1.2, numberOfDeals }
+      result[fxProSymbolMap[symbol]] = { deal: Deal.buy, sl: dayData.avgVol * 1.2, numberOfDeals }
     } else if (isSell) {
-      result[symbol] = { deal: Deal.sell, sl: dayData.avgVol * 1.2, numberOfDeals }
+      result[fxProSymbolMap[symbol]] = { deal: Deal.sell, sl: dayData.avgVol * 1.2, numberOfDeals }
     } else {
-      result[symbol] = { deal: Deal.nothing }
+      result[fxProSymbolMap[symbol]] = { deal: Deal.nothing }
     }
   })
 
