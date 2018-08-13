@@ -11,7 +11,7 @@ export const getQuandlData = (id, startDate, endDate, fileName) => {
       if (fileName) {
         fs.writeFileSync(fileName, JSON.stringify(data))
       } else {
-        return data.dataset.data
+        return data.dataset.data //.slice(0, data.dataset.data.length - 1)
       }
     })
 }

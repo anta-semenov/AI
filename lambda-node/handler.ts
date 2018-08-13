@@ -12,7 +12,7 @@ interface Price {
   close: number
   high: number
   low: number
-  date: string
+  date: number
 }
 
 enum Symbol {
