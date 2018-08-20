@@ -119,12 +119,12 @@ export async function predict(event: any, _: any, callback: Callback) {
       symbolData.minAbsolute = Math.min(symbolData.minAbsolute, input.low)
       symbolData.last20Low.unshift(input.low)
       symbolData.last20High.unshift(input.high)
-      symbolData.volatility.unshift(Math.abs(input.high - input.low))
+      symbolData.volatility.unshift(Math.trunc(Math.abs(input.high - input.low) * 100000) / 100000)
 
       if (symbolData.last20Low.length > INPUT_DEEP) {
         symbolData.last20Low = symbolData.last20Low.slice(0, INPUT_DEEP)
         symbolData.last20High = symbolData.last20High.slice(0, INPUT_DEEP)
-        symbolData.volatility = symbolData.last20High.slice(0, INPUT_DEEP)
+        symbolData.volatility = symbolData.volatility.slice(0, INPUT_DEEP)
       }
 
       const dataForSet = ({
