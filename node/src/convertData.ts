@@ -37,7 +37,7 @@ interface Dictionary<T> {
 }
 
 const symbolsData = JSON.parse(fs.readFileSync('../lambdaData/DataForFix.json') as any) as Dictionary<SymbolData>
-const fxProRawData = JSON.parse(fs.readFileSync('../lambdaData/data2.json') as any) as Dictionary<Dictionary<Price>>
+const fxProRawData = JSON.parse(fs.readFileSync('../lambdaData/data3.json') as any) as Dictionary<Dictionary<Price>>
 
 interface Price {
   open: number
@@ -141,7 +141,7 @@ Object.values(Symbol).forEach((symbol: string) => {
   resultData[symbol] = tempData
 })
 
-fs.writeFileSync('../lambdaData/symbolsDataNew2.json', JSON.stringify(resultData))
+fs.writeFileSync('../lambdaData/symbolsDataNew.json', JSON.stringify(resultData))
 
 // const getDif = (value1: number, value2: number): string => `${(Math.abs(value1 - value2) * 100/value1).toFixed(2)}%`
 //
