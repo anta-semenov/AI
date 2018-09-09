@@ -31,6 +31,10 @@ provider:
         - lambda:InvokeFunction
         - lambda:InvokeAsync
       Resource: "*"
+    - Effect: Allow
+      Action:
+        - ses:SendEmail
+      Resource: "*"
 
   # environment:
   #   AWS_DEFAULT_REGION: ${ssm:boto3DefaultRegion}
@@ -45,3 +49,10 @@ functions:
           method: post
           cors: true
           path: predict
+  sendemail:
+    handler: handler.sendErrorEmail
+    events:
+      - http:
+          method: post
+          cors: true
+          path: sendemail

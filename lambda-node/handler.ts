@@ -226,3 +226,32 @@ export async function predict(event: any, _: any, callback: Callback) {
 
   callback(null, response)
 }
+
+export function sendErrorEmail(event: any, _: any, callback: Callback) {
+  const text = event.body.toString()
+  const ses = new AWS.SES({ region: 'us-east-1' })
+
+  ses.sendEmail({
+    Destination: {
+      ToAddresses: ['anta.semenov@gmail.com'],
+    },
+    Message: {
+      Body: {
+        Text: {
+          Charset: 'UTF-8',
+          Data: text,
+        }
+      },
+      Subject: {
+        Charset: 'UTF-8',
+        Data: 'Error in AI expert',
+      }
+    },
+    Source: 'anta.semenov@icloud.com',
+  }, (err) => {
+    if (err) {
+      console.log(err)
+    }
+    callback(null, { statusCode: 200 })
+  })
+}
