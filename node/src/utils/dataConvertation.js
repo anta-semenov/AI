@@ -126,10 +126,27 @@ const processFile = (symbol) => {
   const volatility = []
 
   tempData.forEach((dayData, index, array) => {
-    const open = dayData.open || array[index - 1].close
-    const close = dayData.close || array[index + 1].open
-    const high = Math.max(dayData.high || 0, open, close)
-    const low = Math.min(dayData.low || DEFAULT_MIN, open, close)
+    const open = dayData.open || array[index - 1].close || array[index - 2].close || array[index - 3].close
+    const close = dayData.close || array[index + 1].open || array[index + 2].open || array[index + 3].open
+    const high = Math.max(dayData.high || 0, open || 0, close || 0)
+    const low = Math.min(dayData.low || DEFAULT_MIN, open || DEFAULT_MIN, close || DEFAULT_MIN)
+
+    if (!open) {
+      nullOpenCount++
+    }
+    if (!close) {
+      nullCloseCount++
+    }
+    if (!high) {
+      nullHighCount++
+    }
+    if (!low) {
+      nullLowCount++
+    }
+
+    if (!open || !close || !high || !low) {
+      return
+    }
 
     minAbsolute = Math.min(minAbsolute, low || DEFAULT_MIN)
     maxAbsolute = Math.max(maxAbsolute, high || 0)

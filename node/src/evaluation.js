@@ -24,9 +24,9 @@ const logDeal = (result, deposit, amount, symbolDayData, stopPrice, symbol, clos
   const date = new Date(symbolDayData.date)
   const volatilityRate = ((symbolDayData.high - symbolDayData.low) / symbolDayData.avgVol).toFixed(2)
   const resultRate = (result * 100 / deposit).toFixed(0)
-  if (resultRate > -10) {
-    return
-  }
+  // if (resultRate > -10) {
+  //   return
+  // }
   // console.log(`${type} result: ${Math.trunc(result)}, depo: ${Math.trunc(deposit)}, symbol: ${symbol}, amount: ${Math.trunc(amount)}, openPrice: ${symbolDayData.open}, closePrice: ${symbolDayData.close}, stopPrice: ${stopPrice}, low: ${symbolDayData.low}, high: ${symbolDayData.high}`)
   // console.log(`${type} result: ${Math.trunc(result)}, depo: ${Math.trunc(deposit)}, symbol: ${symbol}, resultRate: ${resultRate}, volRate: ${volatilityRate}, date: ${date}, amount: ${Math.trunc(amount)}, openPrice: ${symbolDayData.open}, closePrice: ${closePrice}, stopPrice: ${stopPrice}`)
 }
@@ -64,6 +64,7 @@ export const evaluateModel = () => {
   predictions.forEach((predict, predictIndex) => {
     const numberOfDeals = predict.reduce((res, value) => value > 0.7 ? res + 1 : res, 0)
     const dayDeposit = deposit
+    // console.log('+++', dayDeposit, numberOfDeals);
 
     symbols.forEach((symbol, symbolIndex) => {
       const symbolDayData = dayData[predictIndex][symbol]
@@ -81,7 +82,7 @@ export const evaluateModel = () => {
         const result = getDealResult(amount, symbolDayData.open, closePrice)
         result > 0 ? loseDeals++ : winDeals++
         logDeal(result, deposit, amount, symbolDayData, stopPrice, symbol, closePrice, 'buy')
-        deposit += result
+        deposit = deposit + result
         chartData.push([`${totalDeals}`, deposit])
       } else if (isSell) {
         totalDeals++
@@ -91,7 +92,7 @@ export const evaluateModel = () => {
         const result = getDealResult(amount, symbolDayData.open, closePrice, true)
         logDeal(result, deposit, amount, symbolDayData, stopPrice, symbol, closePrice, 'sell')
         result > 0 ? loseDeals++ : winDeals++
-        deposit += result
+        deposit = deposit + result
         chartData.push([`${totalDeals}`, deposit])
       }
 

@@ -31,12 +31,12 @@ const layers = [
   },
   {
     type: 'kohonen',
-    size: [8, 4],
+    size: [10, 4],
     step: 2
   },
   {
     type: 'kohonen',
-    size: [10, 4],
+    size: [15, 4],
     step: 2
   }
 ]
