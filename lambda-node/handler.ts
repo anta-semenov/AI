@@ -41,6 +41,9 @@ const fxProSymbolMap: { [symbol: string]: string } = {
   Wheat: '#Wheat_U8',
   Soybean: '#Soybean_U8',
   XOM: '#ExxonMobil',
+  Silver: 'SILVER',
+  Platinum: 'PLATINUM',
+  Gas: 'NAT.GAS',
 }
 
 interface InputPayload {

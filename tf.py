@@ -22,7 +22,8 @@ for dayData in learnData:
     trainOutput.append(dayData['output'])
 
 model = Sequential([
-    Dense(44, input_shape=(330,)),
+    Dense(165, input_shape=(330,)),
+    Dense(76),
     Dense(22)
 ])
 
