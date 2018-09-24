@@ -190,8 +190,12 @@ double getLotSize(string symbol, double sl, int numberOfDeals, double deposit, d
    double actualMinLotSize = minLotCost;
    if (symbol == "AUDUSD" || symbol == "EURUSD" || symbol == "GBPUSD") {
       actualMinLotSize = minLotCost * price;
-   } else if (symbol == "GOLD" || symbol == "SILVER" || symbol == "PLATINUM") {
+   } else if (symbol == "GOLD" || symbol == "PLATINUM") {
       actualMinLotSize = price * 50 / 1000;
+   } else if (symbol == "SILVER") {
+      actualMinLotSize = price * 50 / 10;
+   } else if (symbol == "NAT.GAS") {
+      actualMinLotSize = price * 10;
    } else if (symbol == "BRENT") {
       actualMinLotSize = price;
    }
