@@ -13,7 +13,7 @@
     "prepareTf": "node ./lib/prepareTFData.js",
     "kohonen": "node ./lib/studyKohonen.js",
     "evaluate": "node ./lib/evaluation.js",
-    "prepareOperatingKohonen": "node ./lib/operation/downloadDayData.js && node ./lib/operation/prepareKohonenData.js",
+    "prepareOperatingKohonen": "node ./lib/operation/downloadDayData.js",
     "describePedictions": "node ./lib/operation/describePrediction.js",
     "convertData": "ts-node ./src/convertData.ts"
   },

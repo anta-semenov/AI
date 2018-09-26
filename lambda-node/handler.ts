@@ -24,9 +24,9 @@ enum Symbol {
   JPY = 'JPY',
   Brent = 'Brent',
   Gold = 'Gold',
-  Wheat = 'Wheat',
-  Soybean = 'Soybean',
-  XOM = 'XOM',
+  Silver = 'Silver',
+  Platinum = 'Platinum',
+  Gas = 'Gas',
 }
 
 const fxProSymbolMap: { [symbol: string]: string } = {
@@ -38,9 +38,6 @@ const fxProSymbolMap: { [symbol: string]: string } = {
   JPY: 'USDJPY',
   Brent: 'BRENT',
   Gold: 'GOLD',
-  Wheat: '#Wheat_U8',
-  Soybean: '#Soybean_U8',
-  XOM: '#ExxonMobil',
   Silver: 'SILVER',
   Platinum: 'PLATINUM',
   Gas: 'NAT.GAS',

@@ -13,9 +13,9 @@ enum Symbol {
   JPY = 'JPY',
   Brent = 'Brent',
   Gold = 'Gold',
-  Wheat = 'Wheat',
-  Soybean = 'Soybean',
-  XOM = 'XOM',
+  Silver = 'Silver',
+  Platinum = 'Platinum',
+  Gas = 'Gas',
 }
 
 const fxProSymbolMap: { [symbol: string]: string } = {
@@ -40,7 +40,7 @@ interface Dictionary<T> {
 }
 
 const symbolsData = JSON.parse(fs.readFileSync('../lambdaData/DataForFix.json') as any) as Dictionary<SymbolData>
-const fxProRawData = JSON.parse(fs.readFileSync('../lambdaData/data3.json') as any) as Dictionary<Dictionary<Price>>
+const fxProRawData = JSON.parse(fs.readFileSync('../lambdaData/data.json') as any) as Dictionary<Dictionary<Price>>
 
 interface Price {
   open: number

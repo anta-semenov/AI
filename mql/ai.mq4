@@ -55,7 +55,7 @@ void OnTick()
    }
 
    if (!shouldTradeToday) {
-      return
+      return;
    }
    shouldTradeToday = false;
 
@@ -165,9 +165,11 @@ void openPosition(string symbol, double sl, int numberOfDeals, string action, do
 
    RefreshRates();
    double openPrice = action == "buy" ? MarketInfo(symbol, MODE_ASK) : MarketInfo(symbol, MODE_BID);
-   orderTicket = OrderSend(symbol, orderType, lot, openPrice, 10, openPrice + slDiff, 0, NULL, magicNumber);
+   orderTicket = OrderSend(symbol, orderType, lot, openPrice, 20, openPrice + slDiff, 0, NULL, magicNumber);
    if (orderTicket < 0) {
-     if (GetLastError() == 136) {
+     int attempts = 0;
+     while (orderTicket < 0 && GetLastError() == 136 && attempts < 5) {
+         attempts = attempts + 1;
          RefreshRates();
          openPrice = action == "buy" ? MarketInfo(symbol, MODE_ASK) : MarketInfo(symbol, MODE_BID);
          orderTicket = OrderSend(symbol, orderType, lot, openPrice, 10, openPrice + slDiff, 0, NULL, magicNumber);
@@ -175,7 +177,9 @@ void openPosition(string symbol, double sl, int numberOfDeals, string action, do
             return;
          }
       }
-      sendErrorEmal("Error while open position: " + symbol + " - " + action + ". Error: " + GetLastError());
+      if (orderTicket < 0) {
+         sendErrorEmal("Error while open position: " + symbol + " - " + action + ". Error: " + GetLastError());
+      }
    }
 }
 
@@ -190,12 +194,14 @@ double getLotSize(string symbol, double sl, int numberOfDeals, double deposit, d
    double actualMinLotSize = minLotCost;
    if (symbol == "AUDUSD" || symbol == "EURUSD" || symbol == "GBPUSD") {
       actualMinLotSize = minLotCost * price;
-   } else if (symbol == "GOLD" || symbol == "PLATINUM") {
+   } else if (symbol == "GOLD") {
       actualMinLotSize = price * 50 / 1000;
    } else if (symbol == "SILVER") {
       actualMinLotSize = price * 50 / 10;
    } else if (symbol == "NAT.GAS") {
       actualMinLotSize = price * 10;
+   } else if (symbol == "PLATINUM") {
+      actualMinLotSize = price / 10;
    } else if (symbol == "BRENT") {
       actualMinLotSize = price;
    }
@@ -212,7 +218,7 @@ void closeAllOrders() {
       bool success = false;
       while (success == false) {
          RefreshRates();
-         success = OrderClose(OrderTicket(), OrderLots(), OrderClosePrice(), 10);
+         success = OrderClose(OrderTicket(), OrderLots(), OrderClosePrice(), 20);
       }
    }
 }
