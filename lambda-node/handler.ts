@@ -183,7 +183,7 @@ export async function predict(event: any, _: any, callback: Callback) {
     kohonenResult = [...kohonenResult, ...localTFInputs, ...absoluteTFInputs]
   })
 
-  await putS3Data('antonsemenov-ai-files', 'kohonen-result.json', JSON.stringify(kohonenResult))
+  // await putS3Data('antonsemenov-ai-files', 'kohonen-result.json', JSON.stringify(kohonenResult))
 
 
   // calling python

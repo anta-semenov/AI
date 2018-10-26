@@ -42,6 +42,9 @@ void OnDeinit(const int reason)
 void OnTick()
   {
 //---
+   if (MarketInfo(Symbol(), MODE_TRADEALLOWED) == 0) {
+      return;
+   }
    if (Time[0] != lastTime) {
        lastTime = Time[0];
        shouldTradeToday = true;
@@ -119,6 +122,7 @@ void OnTick()
 
    if (response.isObject() == false) {
       // wrong payload
+      sendErrorEmal("Wrong payload from backend. Error: " + GetLastError());
       return;
    }
 
@@ -126,6 +130,7 @@ void OnTick()
 
    if (res != 200 || StringFind(CharArrayToString(result), "message") != -1) {
       // there was an error
+      sendErrorEmal("Error on backend. Error: " + CharArrayToString(result));
       return;
    }
 
