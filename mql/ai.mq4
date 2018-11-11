@@ -18,6 +18,21 @@ input int magicNumber;
 input double minLotCost = 50.0;
 input int timeBeforeCloseTreshold = 2;
 
+string symbols[11] = {"AUDUSD", "EURUSD", "GBPUSD", "USDCHF", "USDCAD", "USDJPY", "BRENT", "GOLD", "SILVER", "PLATINUM", "NAT.GAS"};
+bool sendRequestToBackend = false;
+bool tradeAUDUSD = false;
+bool tradeEURUSD = false;
+bool tradeGBPUSD = false;
+bool tradeUSDCHF = false;
+bool tradeUSDCAD = false;
+bool tradeUSDJPY = false;
+bool tradeBRENT = false;
+bool tradeGOLD = false;
+bool tradeSILVER = false;
+bool tradePLATINUM = false;
+bool tradeNAT_GAS = false;
+bool closeOrdersToday = false;
+
 //+------------------------------------------------------------------+
 //| Expert initialization function                                   |
 //+------------------------------------------------------------------+
@@ -48,6 +63,11 @@ void OnTick()
    if (Time[0] != lastTime) {
        lastTime = Time[0];
        shouldTradeToday = true;
+       sendRequestToBackend = false;
+       for(int i=0; i<11; i++) {
+         setTradeFlagForSymbol(symbols[i], false);
+       }
+       closeOrdersToday = false;
    }
 
    if (TimeCurrent() > lastTime + 24 * 60 *60 - timeBeforeCloseTreshold * 60) {
@@ -55,17 +75,23 @@ void OnTick()
    }
    if (TimeCurrent() > lastTime + 2 * 60 * 60) {
       shouldTradeToday = false;
+      for(int i=0; i<11; i++) {
+         setTradeFlagForSymbol(symbols[i], true);
+      }
    }
 
    if (!shouldTradeToday) {
       return;
    }
-   shouldTradeToday = false;
+   // shouldTradeToday = false;
 
-   closeAllOrders();
+   if (!closeOrdersToday) {
+      closeAllOrders();
+      closeOrdersToday = true;
+   }
    double deposit = AccountBalance();
 
-   if (symbolSatelite == true) {
+   if (symbolSatelite == true || getTradeFlagForSymbol(Symbol()) == false) {
 
       int backandFile = FileOpen("backendResponse.txt", FILE_READ);
       string backendString = FileReadString(backandFile);
@@ -85,74 +111,98 @@ void OnTick()
          double sl = symbolData.getDouble("sl");
          int numberOfDeals = symbolData.getInt("numberOfDeals");
          openPosition(Symbol(), sl, numberOfDeals, action, deposit);
+      } else {
+         setTradeFlagForSymbol(Symbol(), true);
       }
 
       return;
    }
 
-   string symbols[11] = {"AUDUSD", "EURUSD", "GBPUSD", "USDCHF", "USDCAD", "USDJPY", "BRENT", "GOLD", "SILVER", "PLATINUM", "NAT.GAS"};
-   JSONObject *symbolsData = new JSONObject();
+   if (!sendRequestToBackend) {
+      JSONObject *symbolsData = new JSONObject();
 
-   for(int i=0; i<11; i++) {
-      string symbol = symbols[i];
+      for(int i=0; i<11; i++) {
+         string symbol = symbols[i];
 
-      JSONObject *symbolData = new JSONObject();
+         JSONObject *symbolData = new JSONObject();
 
-      symbolData.put("high", new JSONNumber(iHigh(symbol, PERIOD_D1, 1)));
-      symbolData.put("low", new JSONNumber(iLow(symbol, PERIOD_D1, 1)));
-      symbolData.put("open", new JSONNumber(iOpen(symbol, PERIOD_D1, 1)));
-      symbolData.put("close", new JSONNumber(iClose(symbol, PERIOD_D1, 1)));
-      symbolData.put("date", new JSONNumber(iTime(symbol, PERIOD_D1, 1) * 1000));
+         symbolData.put("high", new JSONNumber(iHigh(symbol, PERIOD_D1, 1)));
+         symbolData.put("low", new JSONNumber(iLow(symbol, PERIOD_D1, 1)));
+         symbolData.put("open", new JSONNumber(iOpen(symbol, PERIOD_D1, 1)));
+         symbolData.put("close", new JSONNumber(iClose(symbol, PERIOD_D1, 1)));
+         symbolData.put("date", new JSONNumber(iTime(symbol, PERIOD_D1, 1) * 1000));
 
-      symbolsData.put(symbol, symbolData);
-   }
-
-   int timeout = 20000;
-   char result[], post[];
-   string url = "https://m8oa2tz290.execute-api.us-east-2.amazonaws.com/dev/predict";
-   string responseHeader;
-   StringToCharArray(symbolsData.toString(), post);
-
-
-   int res = WebRequest("POST", url, NULL, timeout, post, result, responseHeader);
-   // SendMail("from fx pro", "test message");
-
-   JSONParser *parser = new JSONParser();
-   JSONValue *response = parser.parse(CharArrayToString(result));
-
-   if (response.isObject() == false) {
-      // wrong payload
-      sendErrorEmal("Wrong payload from backend. Error: " + GetLastError());
-      return;
-   }
-
-   JSONObject *payload = response;
-
-   if (res != 200 || StringFind(CharArrayToString(result), "message") != -1) {
-      // there was an error
-      sendErrorEmal("Error on backend. Error: " + CharArrayToString(result));
-      return;
-   }
-
-   int file = FileOpen("backendResponse.txt", FILE_WRITE);
-   FileWriteString(file, payload.toString());
-   FileClose(file);
-
-   for(int i=0; i<11; i++) {
-      string symbol = symbols[i];
-
-      if (StringFind("BRENT_GOLD_SILVER_PLATINUM_NAT.GAS", symbol) != -1) {
-         continue;
+         symbolsData.put(symbol, symbolData);
       }
 
-      JSONObject *symbolResponse = payload.getObject(symbol);
+      int timeout = 20000;
+      char result[], post[];
+      string url = "https://m8oa2tz290.execute-api.us-east-2.amazonaws.com/dev/predict";
+      string responseHeader;
+      StringToCharArray(symbolsData.toString(), post);
 
-      string action = symbolResponse.getString("deal");
 
-      if (action != "nothing") {
-         double sl = symbolResponse.getDouble("sl");
-         int numberOfDeals = symbolResponse.getInt("numberOfDeals");
-         openPosition(symbol, sl, numberOfDeals, action, deposit);
+      int res = WebRequest("POST", url, NULL, timeout, post, result, responseHeader);
+      // SendMail("from fx pro", "test message");
+      sendRequestToBackend = true;
+
+      JSONParser *parser = new JSONParser();
+      JSONValue *response = parser.parse(CharArrayToString(result));
+
+      if (response.isObject() == false) {
+         // wrong payload
+         sendErrorEmal("Wrong payload from backend. Error: " + GetLastError());
+         for(int i=0; i<11; i++) {
+            setTradeFlagForSymbol(symbols[i], true);
+         }
+         return;
+      }
+
+      JSONObject *payload = response;
+
+      if (res != 200 || StringFind(CharArrayToString(result), "message") != -1) {
+         // there was an error
+         sendErrorEmal("Error on backend. Error: " + CharArrayToString(result));
+         for(int i=0; i<11; i++) {
+            setTradeFlagForSymbol(symbols[i], true);
+         }
+         return;
+      }
+
+      int file = FileOpen("backendResponse.txt", FILE_WRITE);
+      FileWriteString(file, payload.toString());
+      FileClose(file);
+   }
+
+   if (sendRequestToBackend == true) {
+      int backandFile = FileOpen("backendResponse.txt", FILE_READ);
+      string backendString = FileReadString(backandFile);
+      FileClose(backandFile);
+      if (backendString == "") {
+         return;
+      }
+
+      JSONParser *fileParser = new JSONParser();
+      JSONObject *payload = fileParser.parse(backendString);
+
+      for(int i=0; i<11; i++) {
+         string symbol = symbols[i];
+
+         if (StringFind("BRENT_GOLD_SILVER_PLATINUM_NAT.GAS", symbol) != -1 || getTradeFlagForSymbol(symbol) == true) {
+            continue;
+         }
+
+         JSONObject *symbolResponse = payload.getObject(symbol);
+
+         string action = symbolResponse.getString("deal");
+
+         if (action != "nothing") {
+            double sl = symbolResponse.getDouble("sl");
+            int numberOfDeals = symbolResponse.getInt("numberOfDeals");
+            openPosition(symbol, sl, numberOfDeals, action, deposit);
+         } else {
+            setTradeFlagForSymbol(symbol, true);
+         }
       }
    }
 
@@ -179,11 +229,14 @@ void openPosition(string symbol, double sl, int numberOfDeals, string action, do
          openPrice = action == "buy" ? MarketInfo(symbol, MODE_ASK) : MarketInfo(symbol, MODE_BID);
          orderTicket = OrderSend(symbol, orderType, lot, openPrice, 10, openPrice + slDiff, 0, NULL, magicNumber);
          if (orderTicket > 0) {
+            setTradeFlagForSymbol(symbol, true);
             return;
          }
       }
       if (orderTicket < 0) {
          sendErrorEmal("Error while open position: " + symbol + " - " + action + ". Error: " + GetLastError());
+      } else {
+         setTradeFlagForSymbol(symbol, true);
       }
    }
 }
@@ -237,4 +290,34 @@ void sendErrorEmal(string message) {
 
 
    int res = WebRequest("POST", url, NULL, timeout, post, result, responseHeader);
+}
+
+bool getTradeFlagForSymbol(string symbol) {
+   if (symbol == "AUDUSD") return tradeAUDUSD;
+   if (symbol == "EURUSD") return tradeEURUSD;
+   if (symbol == "GBPUSD") return tradeGBPUSD;
+   if (symbol == "USDCHF") return tradeUSDCHF;
+   if (symbol == "USDCAD") return tradeUSDCAD;
+   if (symbol == "USDJPY") return tradeUSDJPY;
+   if (symbol == "BRENT") return tradeBRENT;
+   if (symbol == "GOLD") return tradeGOLD;
+   if (symbol == "SILVER") return tradeSILVER;
+   if (symbol == "PLATINUM") return tradePLATINUM;
+   if (symbol == "NAT.GAS") return tradeNAT_GAS;
+
+   return true;
+}
+
+void setTradeFlagForSymbol(string symbol, bool value) {
+   if (symbol == "AUDUSD") tradeAUDUSD = value;
+   if (symbol == "EURUSD") tradeEURUSD = value;
+   if (symbol == "GBPUSD") tradeGBPUSD = value;
+   if (symbol == "USDCHF") tradeUSDCHF = value;
+   if (symbol == "USDCAD") tradeUSDCAD = value;
+   if (symbol == "USDJPY") tradeUSDJPY = value;
+   if (symbol == "BRENT") tradeBRENT = value;
+   if (symbol == "GOLD") tradeGOLD = value;
+   if (symbol == "SILVER") tradeSILVER = value;
+   if (symbol == "PLATINUM") tradePLATINUM = value;
+   if (symbol == "NAT.GAS") tradeNAT_GAS = value;
 }
