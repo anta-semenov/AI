@@ -72,6 +72,7 @@ void OnTick()
 
    if (TimeCurrent() > lastTime + 24 * 60 *60 - timeBeforeCloseTreshold * 60) {
       closeAllOrders();
+      closeAllOrders();
    }
    if (TimeCurrent() > lastTime + 2 * 60 * 60) {
       shouldTradeToday = false;
@@ -86,6 +87,18 @@ void OnTick()
    // shouldTradeToday = false;
 
    if (!closeOrdersToday) {
+      closeAllOrders();
+      closeAllOrders();
+      closeAllOrders();
+      closeAllOrders();
+      closeAllOrders();
+      closeAllOrders();
+      closeAllOrders();
+      closeAllOrders();
+      closeAllOrders();
+      closeAllOrders();
+      closeAllOrders();
+      closeAllOrders();
       closeAllOrders();
       closeOrdersToday = true;
    }
@@ -276,11 +289,8 @@ void closeAllOrders() {
       if(OrderSelect(i,SELECT_BY_POS)==false) continue;
       if (OrderMagicNumber() != magicNumber) continue;
 
-      bool success = false;
-      while (success == false) {
-         RefreshRates();
-         success = OrderClose(OrderTicket(), OrderLots(), OrderClosePrice(), 20);
-      }
+      RefreshRates();
+      OrderClose(OrderTicket(), OrderLots(), OrderClosePrice(), 20);
    }
 }
 
