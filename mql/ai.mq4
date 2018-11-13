@@ -91,28 +91,29 @@ void OnTick()
    }
    double deposit = AccountBalance();
 
-   if (symbolSatelite == true || getTradeFlagForSymbol(Symbol()) == false) {
+   if (symbolSatelite == true) {
+      if (getTradeFlagForSymbol(Symbol()) == false) {
+         int backandFile = FileOpen("backendResponse.txt", FILE_READ);
+         string backendString = FileReadString(backandFile);
+         FileClose(backandFile);
+         if (backendString == "") {
+            return;
+         }
 
-      int backandFile = FileOpen("backendResponse.txt", FILE_READ);
-      string backendString = FileReadString(backandFile);
-      FileClose(backandFile);
-      if (backendString == "") {
-         return;
-      }
+         JSONParser *fileParser = new JSONParser();
+         JSONObject *backendData = fileParser.parse(backendString);
 
-      JSONParser *fileParser = new JSONParser();
-      JSONObject *backendData = fileParser.parse(backendString);
+         JSONObject *symbolData = backendData.getObject(Symbol());
 
-      JSONObject *symbolData = backendData.getObject(Symbol());
+         string action = symbolData.getString("deal");
 
-      string action = symbolData.getString("deal");
-
-      if (action != "nothing") {
-         double sl = symbolData.getDouble("sl");
-         int numberOfDeals = symbolData.getInt("numberOfDeals");
-         openPosition(Symbol(), sl, numberOfDeals, action, deposit);
-      } else {
-         setTradeFlagForSymbol(Symbol(), true);
+         if (action != "nothing") {
+            double sl = symbolData.getDouble("sl");
+            int numberOfDeals = symbolData.getInt("numberOfDeals");
+            openPosition(Symbol(), sl, numberOfDeals, action, deposit);
+         } else {
+            setTradeFlagForSymbol(Symbol(), true);
+         }
       }
 
       return;
@@ -238,6 +239,8 @@ void openPosition(string symbol, double sl, int numberOfDeals, string action, do
       } else {
          setTradeFlagForSymbol(symbol, true);
       }
+   } else {
+      setTradeFlagForSymbol(symbol, true);
    }
 }
 
