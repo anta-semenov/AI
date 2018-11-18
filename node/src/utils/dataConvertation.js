@@ -173,7 +173,7 @@ const processFile = (symbol) => {
       avgVol: Math.trunc(volatility.reduce((res, item) => res + item, 0) * 100000 / volatility.length) / 100000
     })
 
-    if (dayData.date < dateFns.parse('2008-01-01').getTime()) {
+    if (dayData.date < dateFns.parse('2009-01-01').getTime()) {
       learnData.push(dataForSet)
     } else {
       testData.push(dataForSet)

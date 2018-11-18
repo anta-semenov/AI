@@ -15,43 +15,43 @@ from keras.layers import LSTM, Lambda, Dense
 learnData = json.load(open('./DataSet/tfData.json'))
 testData = json.load(open('./DataSet/tfTestData.json'))
 
-# trainInput = []
-# trainOutput = []
-# for dayData in learnData:
-#     trainInput.append(dayData['input'])
-#     trainOutput.append(dayData['output'])
-#
-# model = Sequential([
-#     Dense(165, input_shape=(330,)),
-#     Dense(76),
-#     Dense(22)
-# ])
-#
-# model.compile(optimizer='rmsprop', loss='mean_squared_error', metrics=['accuracy'])
-#
-# model.fit(np.array(trainInput)[0:1533], np.array(trainOutput)[0:1533], epochs=100, batch_size=21)
-#
-# np.save('./DataSet/keras_weights', model.get_weights())
-# with open('./DataSet/keras_config.json', 'w') as configFile:
-#     json.dump(model.get_config(), configFile)
+trainInput = []
+trainOutput = []
+for dayData in learnData:
+    trainInput.append(dayData['input'])
+    trainOutput.append(dayData['output'])
 
-s3 = boto3.client(
-    's3',
-    aws_access_key_id='',
-    aws_secret_access_key='',
-    region_name='us-east-2'
-)
-data = StringIO.StringIO()
-s3.download_fileobj('antonsemenov-ai-files', 'keras-weights', data)
+model = Sequential([
+    Dense(120, input_shape=(352,)),
+    Dense(50),
+    Dense(22)
+])
 
-config = StringIO.StringIO()
-s3.download_fileobj('antonsemenov-ai-files', 'keras_config.json', config)
+model.compile(optimizer='rmsprop', loss='mean_squared_error', metrics=['accuracy'])
 
-json_data=open('./DataSet/keras_config.json').read()
-modelConfig = json.loads(config.getvalue()) # json.loads(json_data) #
-modelWeights =  pickle.loads(data.getvalue()) # np.load('./DataSet/keras_weights.npy') #
-model = Sequential.from_config(modelConfig)
-model.set_weights(modelWeights)
+model.fit(np.array(trainInput)[0:1701], np.array(trainOutput)[0:1701], epochs=100, batch_size=21)
+
+np.save('./DataSet/keras_weights', model.get_weights())
+with open('./DataSet/keras_config.json', 'w') as configFile:
+    json.dump(model.get_config(), configFile)
+
+# s3 = boto3.client(
+#     's3',
+#     aws_access_key_id='',
+#     aws_secret_access_key='',
+#     region_name='us-east-2'
+# )
+# data = StringIO.StringIO()
+# s3.download_fileobj('antonsemenov-ai-files', 'keras-weights', data)
+#
+# config = StringIO.StringIO()
+# s3.download_fileobj('antonsemenov-ai-files', 'keras_config.json', config)
+
+# json_data=open('./DataSet/keras_config.json').read()
+# modelConfig = json.loads(config.getvalue()) # json.loads(json_data) #
+# modelWeights =  pickle.loads(data.getvalue()) # np.load('./DataSet/keras_weights.npy') #
+# model = Sequential.from_config(modelConfig)
+# model.set_weights(modelWeights)
 
 testInput = []
 testOutput = []

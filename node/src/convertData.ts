@@ -1,7 +1,8 @@
 import * as fs from 'fs'
 // import * as dateFns from 'date-fns'
+import {INPUT_DEEP} from './constants'
 
-const INPUT_DEEP = 22
+// const INPUT_DEEP = 22
 const DEFAULT_MIN = 999999999999
 
 enum Symbol {

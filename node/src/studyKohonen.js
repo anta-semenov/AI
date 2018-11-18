@@ -1,5 +1,5 @@
 import {load, save} from './utils/file'
-import {symbols} from './constants'
+import {symbols, INPUT_DEEP} from './constants'
 import {mapMatrix} from './utils/mapMatrix'
 import {kohonenNetStudy} from './study/kohonenStudy'
 
@@ -20,23 +20,23 @@ symbols.forEach(symbol => {
       normalize(close, minLocal, maxLocal)
     ]
   })
-  learnDataLocal.push(...mapMatrix(symbolData, [22, 4], 1, subrange => subrange.reverse()))
+  learnDataLocal.push(...mapMatrix(symbolData, [INPUT_DEEP, 4], 1, subrange => subrange.reverse()))
 })
 
 const layers = [
   {
     type: 'kohonen',
-    size: [6, 4, 4],
-    step: 2
+    size: [8, 8, 4],
+    step: 4
   },
   {
     type: 'kohonen',
-    size: [10, 4],
-    step: 2
+    size: [10, 8],
+    step: 4
   },
   {
     type: 'kohonen',
-    size: [15, 4],
+    size: [16, 4],
     step: 2
   }
 ]
@@ -52,7 +52,7 @@ symbols.forEach(symbol => {
     normalize(low, minAbsolute, maxAbsolute),
     normalize(close, minAbsolute, maxAbsolute)
   ])
-  learnDataAbsolute.push(...mapMatrix(symbolData, [22, 4], 1, subrange => subrange.reverse()))
+  learnDataAbsolute.push(...mapMatrix(symbolData, [INPUT_DEEP, 4], 1, subrange => subrange.reverse()))
 })
 const absoluteLayers = kohonenNetStudy(learnDataAbsolute, layers)
 save('kohonenAbsoluteLayers', absoluteLayers)
