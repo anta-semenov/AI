@@ -4,7 +4,7 @@ import { kohonenNet } from '../node/src/neuroNet/kohonen'
 import * as dateFns from 'date-fns'
 
 // const symbols = ['AUD', 'EUR', 'GBP', 'CHF', 'CAD', 'JPY', 'Brent', 'Gold', 'Wheat', 'Soybean', 'XOM']
-const INPUT_DEEP = 22
+const INPUT_DEEP = 84
 const DEFAULT_MIN = 999999999999
 
 interface Price {
