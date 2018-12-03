@@ -22,8 +22,8 @@ with open('./temp', 'w') as outfile:
 
 s3 = boto3.client(
     's3',
-    aws_access_key_id='AKIAJTLBNAINPVAV4HPA',
-    aws_secret_access_key='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',
+    aws_access_key_id='',
+    aws_secret_access_key='',
     region_name='us-east-2'
 )
 
