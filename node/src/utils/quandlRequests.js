@@ -1,6 +1,6 @@
-import fetch from 'node-fetch'
-import fs from 'fs'
-import dateFns from 'date-fns'
+import * as fetch from 'node-fetch'
+import * as fs from 'fs'
+import * as dateFns from 'date-fns'
 
 export const getQuandlData = (id, startDate, endDate, fileName) => {
   const startDateCondition = startDate ? `&start_date=${dateFns.format(startDate, 'YYYY-MM-DD')}` : ''

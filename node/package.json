@@ -15,7 +15,8 @@
     "evaluate": "node ./lib/evaluation.js",
     "prepareOperatingKohonen": "node ./lib/operation/downloadDayData.js",
     "describePedictions": "node ./lib/operation/describePrediction.js",
-    "convertData": "ts-node ./src/convertData.ts"
+    "convertData": "ts-node ./src/convertData.ts",
+    "downloadRawData": "ts-node ./src/downloadSymbolsRawData.ts"
   },
   "author": "",
   "license": "MIT",
@@ -40,6 +41,7 @@
     "ts-node": "^7.0.0",
     "tsc": "^1.20150623.0",
     "tslint": "^5.11.0",
-    "typescript": "^3.0.1"
+    "typescript": "^3.0.1",
+    "tslint-eslint-rules": "4.1.1"
   }
 }
