@@ -16,7 +16,8 @@
     "prepareOperatingKohonen": "node ./lib/operation/downloadDayData.js",
     "describePedictions": "node ./lib/operation/describePrediction.js",
     "convertData": "ts-node ./src/convertData.ts",
-    "downloadRawData": "ts-node ./src/downloadSymbolsRawData.ts"
+    "downloadRawData": "ts-node ./src/downloadSymbolsRawData.ts",
+    "testStrategies": "ts-node ./src/strategyTester.ts"
   },
   "author": "",
   "license": "MIT",

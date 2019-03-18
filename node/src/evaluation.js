@@ -113,6 +113,13 @@ export const evaluateModel = () => {
   console.log(`depo: ${deposit}, %: ${deposit / startDeposit * 100}, maxDropDown: ${maxDropDownPercent}`)
   console.log(`total: ${totalDeals}, win: ${winDeals}, lose: ${loseDeals}`);
   writeChartData(chartData)
+  fs.writeFileSync('./evaluationResult.json', JSON.stringify({
+    depositRise: deposit / startDeposit,
+    dropDown: maxDropDownPercent,
+    totalDeals,
+    winDeals,
+    loseDeals,
+  }))
 }
 
 evaluateModel()
