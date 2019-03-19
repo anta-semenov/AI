@@ -1,25 +1,25 @@
-import {kohonenNet} from './neuroNet/kohonen'
-import {INPUT_DEEP} from './constants'
+import { kohonenNet } from './neuroNet/kohonen'
+import { INPUT_DEEP } from './constants'
+import { ExtremumPeriod, NetWeights, DayData, Instrument, InstrumentsData, DataType } from './types'
 
-const normalize = (value, min, max) => (value - min) / (max - min)
+const normalize = (value: number, min: number, max: number): number => (value - min) / (max - min)
 
-const unshiftKohonenInputData = (input, symbol, dataItem) => {
-  const {open, close, high, low, minLocal, maxLocal, minAbsolute, maxAbsolute} = dataItem[symbol]
-  input[symbol].local.unshift([
-    normalize(open, minLocal, maxLocal),
-    normalize(high, minLocal, maxLocal),
-    normalize(low, minLocal, maxLocal),
-    normalize(close, minLocal, maxLocal)
-  ])
-  input[symbol].absolute.unshift([
-    normalize(open, minAbsolute, maxAbsolute),
-    normalize(high, minAbsolute, maxAbsolute),
-    normalize(low, minAbsolute, maxAbsolute),
-    normalize(close, minAbsolute, maxAbsolute)
-  ])
+type ExtremumLayersInput = Record<ExtremumPeriod, number[][]>
+
+const unshiftKohonenInputData = (input: Record<Instrument, ExtremumLayersInput>, symbol: Instrument, dataItem: DayData) => {
+  const { open, close, high, low, extremumData } = dataItem[symbol]
+  Object.keys(ExtremumPeriod).forEach((period: ExtremumPeriod) => {
+    const { min, max } = extremumData[period]
+    input[symbol][period].unshift([
+      normalize(open, min, max),
+      normalize(high, min, max),
+      normalize(low, min, max),
+      normalize(close, min, max),
+    ])
+  })
 }
 
-const getSymbolDayResult = (tomorrowOpen, open, low, high, vol) => {
+const getSymbolDayResult = (tomorrowOpen: number, open: number, low: number, high: number, vol: number): [1, 0] | [0, 1] | [0, 0] => {
   const openDiff = Math.abs(tomorrowOpen - open)
   const lowDropdown = Math.abs(low - open)
   const highDropdown = Math.abs(high - open)
@@ -33,10 +33,12 @@ const getSymbolDayResult = (tomorrowOpen, open, low, high, vol) => {
   }
 }
 
-export const prepareTFData = (symbols, dayData, kohonenAbsoluteLayers, kohonenLocalLayers, dataKey = 'learnData') => {
+
+
+export const prepareTFData = (instrumentsData: InstrumentsData, weights: NetWeights, dataType: DataType = DataType.LearnData) => {
   const resultData = []
-  const inputBuffer = {}
-  symbols.forEach(symbol => {
+  const inputBuffer:  = {}
+  Instrument.all.forEach((symbol) => {
     inputBuffer[symbol] = {
       local: [],
       absolute: []
