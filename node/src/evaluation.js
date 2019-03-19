@@ -95,19 +95,21 @@ export const evaluateModel = () => {
         deposit = deposit + result
         chartData.push([`${totalDeals}`, deposit])
       }
-
-      if (deposit <= 0) {
-        throw Error('No money')
-      } else if (deposit > maxDepo) {
-        const dropDown = ((maxDepo - minDropDownDepo) * 100 / maxDepo).toFixed(2)
-        maxDropDownPercent = Math.max(dropDown, maxDropDownPercent)
-        maxDepo = deposit
-        minDropDownDepo = deposit
-      } else {
-        minDropDownDepo = Math.min(minDropDownDepo, deposit)
-      }
     })
+
+    if (deposit <= 0) {
+      throw Error('No money')
+    } else if (deposit > maxDepo) {
+      const dropDown = ((maxDepo - minDropDownDepo) * 100 / maxDepo).toFixed(2)
+      maxDropDownPercent = Math.max(dropDown, maxDropDownPercent)
+      maxDepo = deposit
+      minDropDownDepo = deposit
+    } else {
+      minDropDownDepo = Math.min(minDropDownDepo, deposit)
+    }
   })
+  const dropDown = ((maxDepo - minDropDownDepo) * 100 / maxDepo).toFixed(2)
+  maxDropDownPercent = Math.max(dropDown, maxDropDownPercent)
 
   console.log('End of evaluation')
   console.log(`depo: ${deposit}, %: ${deposit / startDeposit * 100}, maxDropDown: ${maxDropDownPercent}`)
