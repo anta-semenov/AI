@@ -19,7 +19,7 @@ total: ${evaluation.totalDeals}, win: ${evaluation.winDeals}, lose: ${evaluation
   console.log(resultText)
 
   if ((evaluation.dropDown < maxDropDown && evaluation.depositRise > maxDepositRise) ||
-      (evaluation.dropDown / maxDropDown < 0.9 && evaluation.depositRise / maxDepositRise > 0.005 && evaluation.depositRise > 100)) {
+      (evaluation.dropDown / maxDropDown < 0.9 && evaluation.depositRise / maxDepositRise > 0.005 && evaluation.depositRise > 10000)) {
     maxDropDown = evaluation.dropDown
     maxDepositRise = evaluation.depositRise
     fs.copyFileSync('../DataSet/keras_config.json', '../LuckyModels/temp/keras_config.json')

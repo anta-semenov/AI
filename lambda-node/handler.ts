@@ -29,7 +29,7 @@ enum Symbol {
   Gas = 'Gas',
 }
 
-const fxProSymbolMap: { [symbol: string]: string } = {
+const fxProSymbolMap: Record<Symbol, string> = {
   AUD: 'AUDUSD',
   EUR: 'EURUSD',
   GBP: 'GBPUSD',

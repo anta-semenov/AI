@@ -13,7 +13,7 @@ export const points = {
   XOM: 100,
 }
 
-export const INPUT_DEEP = 84
+export const INPUT_DEEP = 22
 export const NUMBER_OF_LOCAL_SECTORS = 15
 export const NUMBER_OF_ABSOULTE_SECTORS = 15
 

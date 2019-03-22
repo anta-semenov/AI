@@ -1,2 +1,2 @@
-depo%: 35765.64100693048, maxDropDown: 48.81
-total: 2927, win: 1671, lose: 1256
+depo%: 12831830.004342223, maxDropDown: 64.39
+total: 3147, win: 1742, lose: 1405
