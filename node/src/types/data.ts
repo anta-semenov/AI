@@ -23,7 +23,7 @@ interface ExtremumData {
   max: number
 }
 
-export interface SymbolDayData {
+export interface InstrumentDayData {
   date: number
   open: number
   close: number
@@ -33,7 +33,7 @@ export interface SymbolDayData {
   extremumData: Record<ExtremumPeriod, ExtremumData>
 }
 
-export type DayData = Record<Instrument, SymbolDayData>
+export type DayData = Record<Instrument, InstrumentDayData>
 
 export enum DataType {
   LearnData = 'LearnData',

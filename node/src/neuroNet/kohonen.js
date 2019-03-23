@@ -49,8 +49,15 @@ export const kohonenNet = (input, layers, convertOutput) => {
 
   if (convertOutput) {
     const lastLayerFiltersCount = layers[layers.length - 1].filters.length
-    return Array.apply(null, { length: lastLayerFiltersCount }).map((_, index) => output[0] === index ? 1 : 0)
+    return converKohonenClass(output[0], lastLayerFiltersCount)
   } else {
     return output
   }
+}
+
+export const converKohonenClass = (resultClass, numberOfClasses) => {
+  if (resultClass >= numberOfClasses) {
+    throw Error('kohonen result class is higher then possible')
+  }
+  return Array.apply(null, { length: numberOfClasses }).map((_, index) => resultClass === index ? 1 : 0)
 }

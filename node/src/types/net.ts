@@ -26,12 +26,29 @@ export interface KohonenConvolutionLayerWeights extends LayerBase<LayerType.Conv
   step: number
 }
 
-export interface KohonenUnionLayeWeights extends LayerBase<LayerType.UnionKohonen> {
+export interface KohonenUnionLayerWeights extends LayerBase<LayerType.UnionKohonen> {
   filters: number[][]
 }
 
-export interface NetWeights {
-  extremumLayersSpecs: KohonenUnionLayerSpecs[]
-  extremumLayersWeights: Record<ExtremumPeriod, KohonenConvolutionLayerWeights[]>
-  unionLayerWeights?: KohonenUnionLayeWeights
+export enum NetworkType {
+  ConvolutionOnly = 'ConvolutionOnly',
+  Union = 'Union',
 }
+
+interface NetWeightsBase <T extends NetworkType> {
+  type: T
+}
+
+interface ConvolutionNetWeights extends NetWeightsBase<NetworkType.ConvolutionOnly> {
+  extremumLayersSpecs: KohonenConvolutionLayerSpecs[]
+  extremumLayersWeights: Record<ExtremumPeriod, KohonenConvolutionLayerWeights[]>
+}
+
+interface UnionNetWeights extends NetWeightsBase<NetworkType.Union> {
+  extremumLayersSpecs: KohonenConvolutionLayerSpecs[]
+  extremumLayersWeights: Record<ExtremumPeriod, KohonenConvolutionLayerWeights[]>
+  unionLayerWeights: KohonenUnionLayerWeights
+  unionLayerSpecs: KohonenUnionLayerSpecs
+}
+
+export type NetWeights = ConvolutionNetWeights | UnionNetWeights

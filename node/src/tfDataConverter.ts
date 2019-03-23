@@ -1,21 +1,23 @@
-import { kohonenNet } from './neuroNet/kohonen'
+import { kohonenNet, kohonen, converKohonenClass } from './neuroNet/kohonen'
 import { INPUT_DEEP } from './constants'
-import { ExtremumPeriod, NetWeights, DayData, Instrument, InstrumentsData, DataType } from './types'
+import { ExtremumPeriod, NetWeights, DayData, Instrument, InstrumentsData, DataType, KeyedDictionary, NetworkType } from './types'
+import { groupByAndMap, mapValues, mapKeysAndValues, flattenArray } from './utils/object'
 
 const normalize = (value: number, min: number, max: number): number => (value - min) / (max - min)
 
-type ExtremumLayersInput = Record<ExtremumPeriod, number[][]>
+type ExtremumLayersInput = KeyedDictionary<ExtremumPeriod, number[][]>
 
-const unshiftKohonenInputData = (input: Record<Instrument, ExtremumLayersInput>, symbol: Instrument, dataItem: DayData) => {
-  const { open, close, high, low, extremumData } = dataItem[symbol]
-  Object.keys(ExtremumPeriod).forEach((period: ExtremumPeriod) => {
+const addKohonenInputData = (input: ExtremumLayersInput, instrument: Instrument, dataItem: DayData): ExtremumLayersInput => {
+  const { open, close, high, low, extremumData } = dataItem[instrument]
+  return mapKeysAndValues(input, (period: ExtremumPeriod, data: number[][]) => {
     const { min, max } = extremumData[period]
-    input[symbol][period].unshift([
+    const dayData = [
       normalize(open, min, max),
       normalize(high, min, max),
       normalize(low, min, max),
       normalize(close, min, max),
-    ])
+    ]
+    return [dayData, ...data]
   })
 }
 
@@ -33,36 +35,33 @@ const getSymbolDayResult = (tomorrowOpen: number, open: number, low: number, hig
   }
 }
 
-
+interface DayResult {
+  input: Array<1 | 0>,
+  output: Array<1 | 0>,
+}
 
 export const prepareTFData = (instrumentsData: InstrumentsData, weights: NetWeights, dataType: DataType = DataType.LearnData) => {
-  const resultData = []
-  const inputBuffer:  = {}
-  Instrument.all.forEach((symbol) => {
-    inputBuffer[symbol] = {
-      local: [],
-      absolute: []
-    }
-  })
+  const resultData: DayResult[] = []
+  let inputBuffer: KeyedDictionary<Instrument, ExtremumLayersInput> = groupByAndMap(Instrument.all, (id) => id, () => groupByAndMap(ExtremumPeriod.all, (period) => period, () => []))
 
-  dayData[dataKey].forEach((dataItem, index) => {
+  const source = dataType === DataType.LearnData ? instrumentsData.LearnData : instrumentsData.TestData
+
+  source.forEach((dataItem, index) => {
     if (index < INPUT_DEEP) {
-      symbols.forEach(symbol => {
-        unshiftKohonenInputData(inputBuffer, symbol, dataItem)
-      })
+      inputBuffer = mapKeysAndValues(inputBuffer, (instrument: Instrument, extremumData) => addKohonenInputData(extremumData!, instrument, dataItem))
       return
-    } else if (index < dayData[dataKey].length - 1) {
-      const dayResult = {
+    } else if (index < source.length - 1) {
+      const dayResult: DayResult = {
         input: [],
-        output: []
+        output: [],
       }
 
-      symbols.forEach(symbol => {
+      Instrument.all.forEach((instrument) => {
         // Вход для символа представляет собой массив свечек где 0 это вчера
         // берем текущие данные и результат за пред день и вычисляем выходы
-        const symbolDayData = dataItem[symbol]
+        const symbolDayData = dataItem[instrument]
         const symbolDayResult = getSymbolDayResult(
-          dayData[dataKey][index + 1][symbol].open,
+          source[index + 1][instrument].open,
           symbolDayData.open,
           symbolDayData.low,
           symbolDayData.high,
@@ -74,14 +73,26 @@ export const prepareTFData = (instrumentsData: InstrumentsData, weights: NetWeig
         // run kohonenNet для каждого символа для local и absolute
         // и добовляем inputs результата
         // console.log('++++', inputBuffer[symbol].local.length);
-        const localTFInputs = kohonenNet(inputBuffer[symbol].local, kohonenLocalLayers, true)
-        const absoluteTFInputs = kohonenNet(inputBuffer[symbol].absolute, kohonenAbsoluteLayers, true)
-        dayResult.input = [...dayResult.input, ...localTFInputs, ...absoluteTFInputs]
+        const convolutionKohonenResult = flattenArray(ExtremumPeriod.all.map((period) => kohonenNet((inputBuffer[instrument]!)[period], weights.extremumLayersWeights[period], false)))
+        if (convolutionKohonenResult.length !== ExtremumPeriod.all.length) {
+          throw Error('kohonen extremum net returns not plain clases')
+        }
+        if (weights.type === NetworkType.Union) {
+          const unnionKohonenClass = converKohonenClass(kohonen(convolutionKohonenResult, weights.unionLayerWeights.filters), weights.unionLayerSpecs.size)
+          dayResult.input = [...dayResult.input, ...unnionKohonenClass]
+        } else {
+          const numberOfFilters = weights.extremumLayersSpecs[weights.extremumLayersSpecs.length - 1].size[0]
+          const convertedConvolutionKohonenResult = flattenArray(convolutionKohonenResult.map((resultClass) => converKohonenClass(resultClass, numberOfFilters)))
+          // TODO: update kohonen net types
+          dayResult.input = [...dayResult.input, ...convertedConvolutionKohonenResult]
+        }
+
 
         // добавляем данные текущего дня в инпут сети
-        inputBuffer[symbol].local.pop()
-        inputBuffer[symbol].absolute.pop()
-        unshiftKohonenInputData(inputBuffer, symbol, dataItem)
+        inputBuffer = mapValues(inputBuffer, (extremumData: ExtremumLayersInput) => {
+          return mapValues(extremumData, (dataArray) => dataArray!.slice(0, -1)) as Record<ExtremumPeriod, number[][]>
+        })
+        inputBuffer = mapKeysAndValues(inputBuffer, (instrument: Instrument, extremumData: ExtremumLayersInput) => addKohonenInputData(extremumData, instrument, dataItem))
       })
 
       resultData.push(dayResult)
