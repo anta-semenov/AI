@@ -1,14 +1,12 @@
 import { kohonenNet, kohonen, converKohonenClass } from './neuroNet/kohonen'
 import { INPUT_DEEP } from './constants'
 import { ExtremumPeriod, NetWeights, DayData, Instrument, InstrumentsData, DataType, KeyedDictionary, NetworkType } from './types'
-import { groupByAndMap, mapValues, mapKeysAndValues, flattenArray } from './utils/object'
-
-const normalize = (value: number, min: number, max: number): number => (value - min) / (max - min)
+import { groupByAndMap, mapValues, mapKeysAndValues, flattenArray, normalize } from './utils/standard'
 
 type ExtremumLayersInput = KeyedDictionary<ExtremumPeriod, number[][]>
 
 const addKohonenInputData = (input: ExtremumLayersInput, instrument: Instrument, dataItem: DayData): ExtremumLayersInput => {
-  const { open, close, high, low, extremumData } = dataItem[instrument]
+  const { open, close, high, low, extremumData } = dataItem[instrument]!
   return mapKeysAndValues(input, (period: ExtremumPeriod, data: number[][]) => {
     const { min, max } = extremumData[period]
     const dayData = [
@@ -59,9 +57,9 @@ export const prepareTFData = (instrumentsData: InstrumentsData, weights: NetWeig
       Instrument.all.forEach((instrument) => {
         // Вход для символа представляет собой массив свечек где 0 это вчера
         // берем текущие данные и результат за пред день и вычисляем выходы
-        const symbolDayData = dataItem[instrument]
+        const symbolDayData = dataItem[instrument]!
         const symbolDayResult = getSymbolDayResult(
-          source[index + 1][instrument].open,
+          source[index + 1][instrument]!.open,
           symbolDayData.open,
           symbolDayData.low,
           symbolDayData.high,
@@ -73,7 +71,7 @@ export const prepareTFData = (instrumentsData: InstrumentsData, weights: NetWeig
         // run kohonenNet для каждого символа для local и absolute
         // и добовляем inputs результата
         // console.log('++++', inputBuffer[symbol].local.length);
-        const convolutionKohonenResult = flattenArray(ExtremumPeriod.all.map((period) => kohonenNet((inputBuffer[instrument]!)[period], weights.extremumLayersWeights[period], false)))
+        const convolutionKohonenResult = flattenArray(ExtremumPeriod.all.map((period) => kohonenNet((inputBuffer[instrument]!)[period]!, weights.extremumLayersWeights[period])))
         if (convolutionKohonenResult.length !== ExtremumPeriod.all.length) {
           throw Error('kohonen extremum net returns not plain clases')
         }

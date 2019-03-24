@@ -22,7 +22,7 @@ export interface KohonenUnionLayerSpecs extends LayerBase<LayerType.UnionKohonen
 export type LayerSpecs = KohonenConvolutionLayerSpecs | KohonenUnionLayerSpecs
 
 export interface KohonenConvolutionLayerWeights extends LayerBase<LayerType.ConvolutionKohonen> {
-  filters: number[][] | number[][][]
+  filters: Array<number[] | number[][]>
   step: number
 }
 
@@ -37,6 +37,11 @@ export enum NetworkType {
 
 interface NetWeightsBase <T extends NetworkType> {
   type: T
+}
+
+export interface NetSpecs {
+  convolutionLayers: KohonenConvolutionLayerSpecs[]
+  unionLayer?: KohonenUnionLayerSpecs
 }
 
 interface ConvolutionNetWeights extends NetWeightsBase<NetworkType.ConvolutionOnly> {

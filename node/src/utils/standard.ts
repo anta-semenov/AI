@@ -49,3 +49,5 @@ export const groupByAndMap = <T, U>(fromArray: T[], keyExtractor: (item: T, inde
 export const flattenArray = <T>(arrays: T[][]): T[] => {
   return ([] as T[]).concat(...arrays)
 }
+
+export const normalize = (value: number, min: number, max: number): number => (value - min) / (max - min)
