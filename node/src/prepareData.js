@@ -1,3 +1,3 @@
-import {convertData} from './utils/dataConvertation'
+import { convertData } from './utils/dataConvertation'
 
 convertData()
