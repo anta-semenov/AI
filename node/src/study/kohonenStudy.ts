@@ -1,4 +1,4 @@
-import math from 'mathjs'
+import * as math from 'mathjs'
 import { randomInt } from './utils'
 import { kohonen, getDistance, kohonenConvolutionLayer } from '../neuroNet/kohonen'
 import { mapMatrix } from '../utils/mapMatrix'
@@ -34,8 +34,8 @@ interface KohonenStudyParams {
 export const kohonenStudy = ({ data, numberOfFilters, error, maxIterations }: KohonenStudyParams) => {
   // Init filters
   const startFilterInitIndex = randomInt(0, data.length * 0.7)
-  const filterSize = math.size(data[0])
-  const size = math.flatten(data[0]).length
+  const filterSize = math.size(data[0]) as number[]
+  const size = (math.flatten(data[0]) as number[]).length
   let filters = (new Array(numberOfFilters)).fill(0).map((_, index) => {
     const randomDataIndex = startFilterInitIndex + Math.trunc(index * size * 3)
     return math.flatten(data[randomDataIndex]) as number[]
@@ -52,7 +52,7 @@ export const kohonenStudy = ({ data, numberOfFilters, error, maxIterations }: Ko
   let shouldStudy = true
   while (shouldStudy) {
     const dataIndex = randomInt(0, dataAmount)
-    const iterationResult = kohonenStudyIteration(iteration, math.flatten(data[dataIndex]), filters)
+    const iterationResult = kohonenStudyIteration(iteration, math.flatten(data[dataIndex]) as number[], filters)
     iteration++
     filters = iterationResult.filters
 
@@ -92,7 +92,7 @@ export const kohonenNetStudy = (data: number[][][], layers: KohonenConvolutionLa
 }
 
 export const prepareLearnData = (input: Array<number[] | number[][]>, filterSize: number[], step: number) => {
-  if (math.size(input).length === filterSize.length + 1) {
+  if ((math.size(input as any) as number[]).length === filterSize.length + 1) {
     const result: Array<number[] | number[][]> = []
     input.forEach((inputItem) => {
       const newInput = mapMatrix(inputItem, filterSize, step, (subrange: any) => subrange) as Array<number[] | number[][]>

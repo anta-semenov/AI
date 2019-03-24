@@ -13,7 +13,7 @@ const learnData: KeyedDictionary<ExtremumPeriod, number[][][]> = {}
 ExtremumPeriod.all.forEach((period) => {
   learnData[period] = []
   Instrument.all.forEach((instrument) => {
-    const symbolData = data.LearnData[instrument].map(({ open, close, high, low, extremumData, date }) => {
+    const symbolData = data.LearnData[instrument]!.map(({ open, close, high, low, extremumData, date }) => {
       const { min, max } = extremumData[period]
       if (close < min || low < min || open < min) {
         console.log('123', new Date(date), close, low, min)
@@ -29,17 +29,33 @@ ExtremumPeriod.all.forEach((period) => {
   })
 })
 
+// {
+//   type: 'kohonen',
+//   size: [6, 4, 4],
+//   step: 2
+// },
+// {
+//   type: 'kohonen',
+//   size: [10, 4],
+//   step: 2
+// },
+// {
+//   type: 'kohonen',
+//   size: [15, 4],
+//   step: 2
+// }
+
 const netSpecs: NetSpecs = {
   convolutionLayers: [
     {
       type: LayerType.ConvolutionKohonen,
-      size: [8, 8, 4],
-      step: 4,
+      size: [8, 4, 4],
+      step: 2,
     },
     {
       type: LayerType.ConvolutionKohonen,
-      size: [10, 8],
-      step: 4,
+      size: [12, 4],
+      step: 2,
     },
     {
       type: LayerType.ConvolutionKohonen,
@@ -49,7 +65,7 @@ const netSpecs: NetSpecs = {
   ],
   unionLayer: {
     type: LayerType.UnionKohonen,
-    size: 15,
+    size: 20,
   },
 }
 
@@ -66,27 +82,27 @@ if (!netSpecs.unionLayer) {
   }
 
   save('kohonenNetWeights', netWeights)
-}
-
-const unionLearnData = learnData.Absolute!.map((_, index) => {
-  const inputResult = ExtremumPeriod.all.map((period) => {
-    return kohonenNet(learnData[period]![index], convolutionWeights[period]!)
+} else {
+  const unionLearnData = learnData.Absolute!.map((_, index) => {
+    const inputResult = ExtremumPeriod.all.map((period) => {
+      return kohonenNet(learnData[period]![index], convolutionWeights[period]!)
+    })
+    return flattenArray(inputResult)
   })
-  return flattenArray(inputResult)
-})
 
 
-const unionWeights = kohonenStudy({ data: unionLearnData, numberOfFilters: netSpecs.unionLayer!.size }) as number[][]
+  const unionWeights = kohonenStudy({ data: unionLearnData, numberOfFilters: netSpecs.unionLayer!.size }) as number[][]
 
-const netWeights: NetWeights = {
-  type: NetworkType.Union,
-  extremumLayersSpecs: netSpecs.convolutionLayers,
-  extremumLayersWeights: convolutionWeights as Record<ExtremumPeriod, KohonenConvolutionLayerWeights[]>,
-  unionLayerSpecs: netSpecs.unionLayer!,
-  unionLayerWeights: {
-    type: LayerType.UnionKohonen,
-    filters: unionWeights,
-  },
+  const netWeights: NetWeights = {
+    type: NetworkType.Union,
+    extremumLayersSpecs: netSpecs.convolutionLayers,
+    extremumLayersWeights: convolutionWeights as Record<ExtremumPeriod, KohonenConvolutionLayerWeights[]>,
+    unionLayerSpecs: netSpecs.unionLayer!,
+    unionLayerWeights: {
+      type: LayerType.UnionKohonen,
+      filters: unionWeights,
+    },
+  }
+
+  save('kohonenNetWeights', netWeights)
 }
-
-save('kohonenNetWeights', netWeights)

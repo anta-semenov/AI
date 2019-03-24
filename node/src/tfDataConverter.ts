@@ -44,6 +44,8 @@ export const prepareTFData = (instrumentsData: InstrumentsData, weights: NetWeig
 
   const source = dataType === DataType.LearnData ? instrumentsData.LearnData : instrumentsData.TestData
 
+  console.log('source length', source.length)
+
   source.forEach((dataItem, index) => {
     if (index < INPUT_DEEP) {
       inputBuffer = mapKeysAndValues(inputBuffer, (instrument: Instrument, extremumData) => addKohonenInputData(extremumData!, instrument, dataItem))

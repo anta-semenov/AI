@@ -34,7 +34,7 @@ export const kohonen = (input: Array<number | number[]>, filters: Array<number[]
 
 export const kohonenConvolutionLayer = (input: Array<number | number[]>, filters: Array<number[] | number[][]>, step: number): Array<number | number[]> => {
   const inputSize = math.size(input)
-  const filterSize = math.size(filters[0])
+  const filterSize = math.size(filters[0]) as number[]
 
   if (filterSize.length !== inputSize.length) {
     // console.log('filters', filters);
@@ -43,7 +43,7 @@ export const kohonenConvolutionLayer = (input: Array<number | number[]>, filters
     throw new Error('Filter and input dimensions are not the same')
   }
 
-  return mapMatrix(input, filterSize, step, (subrange) => kohonen(subrange, filters))
+  return mapMatrix(input, filterSize, step, (subrange) => kohonen(subrange, filters)) as Array<number | number[]>
 }
 
 export const kohonenNet = (input: Array<number | number[]>, layers: KohonenConvolutionLayerWeights[]): number[] => {

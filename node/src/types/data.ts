@@ -3,6 +3,7 @@ import { KeyedDictionary } from './standard'
 
 export enum ExtremumPeriod {
   Short = 'Short',
+  HalfYear = 'HalfYear',
   Year = 'Year',
   Absolute = 'Absolute',
 }
@@ -11,6 +12,7 @@ export namespace ExtremumPeriod {
   export const getStorageArrayLengthFor = (period: ExtremumPeriod): number => {
     switch (period) {
       case ExtremumPeriod.Short: return 22
+      case ExtremumPeriod.HalfYear: return 125
       case ExtremumPeriod.Year: return 251
       case ExtremumPeriod.Absolute: return -1
     }
