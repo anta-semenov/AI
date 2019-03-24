@@ -24,8 +24,7 @@ total: ${evaluation.totalDeals}, win: ${evaluation.winDeals}, lose: ${evaluation
     maxDepositRise = evaluation.depositRise
     fs.copyFileSync('../DataSet/keras_config.json', '../LuckyModels/temp/keras_config.json')
     fs.copyFileSync('../DataSet/keras_weights.npy', '../LuckyModels/temp/keras_weights.npy')
-    fs.copyFileSync('../DataSet/kohonenAbsoluteLayers.json', '../LuckyModels/temp/kohonenAbsoluteLayers.json')
-    fs.copyFileSync('../DataSet/kohonenLocalLayers.json', '../LuckyModels/temp/kohonenLocalLayers.json')
+    fs.copyFileSync('../DataSet/kohonenNetWeights.json', '../LuckyModels/temp/kohonenNetWeights.json')
     fs.writeFileSync('../LuckyModels/temp/readme.txt', resultText)
   }
 }
