@@ -1,23 +1,23 @@
 import {symbols, INPUT_DEEP, NUMBER_OF_LOCAL_SECTORS, NUMBER_OF_ABSOULTE_SECTORS} from '../constants'
-import math from 'mathjs'
+import * as math from 'mathjs'
 
-interface InstrumentDayData {
-  date: number,
-  open: number,
-  close: number,
-  high: number,
-  low: number,
-  maxAbsolute: number,
-  minAbsolute: number,
-  maxLocal: number,
-  minLocal: number
-}
+// interface InstrumentDayData {
+//   date: number,
+//   open: number,
+//   close: number,
+//   high: number,
+//   low: number,
+//   maxAbsolute: number,
+//   minAbsolute: number,
+//   maxLocal: number,
+//   minLocal: number
+// }
+//
+// interface Data {
+//   [string]: InstrumentDayData[]
+// }
 
-interface Data {
-  [string]: InstrumentDayData[]
-}
-
-export const getInputs = (data: Data, index: number): number[][][] => {
+export const getInputs = (data, index) => {
   if (index + 1 < INPUT_DEEP) {
     throw new Error('not enougth data')
   }
@@ -33,7 +33,7 @@ export const getInputs = (data: Data, index: number): number[][][] => {
     const inputAbsolute = []
     const inputLocal = []
 
-    symbolData.forEach((dayData: InstrumentDayData) => {
+    symbolData.forEach((dayData) => {
       inputLocal.push([
         getSectorArray(NUMBER_OF_LOCAL_SECTORS, get20Sector(dayData.open)),
         getSectorArray(NUMBER_OF_LOCAL_SECTORS, get20Sector(dayData.close)),
@@ -57,7 +57,7 @@ export const getInputs = (data: Data, index: number): number[][][] => {
 
  export const getSectorArray = (size, sector) => (new Array(size)).fill(0).map((_, index) => index === sector ? 1 : 0)
 
-export const sectorCreator = (min: number, max: number, numberOfSectors: number) => {
+export const sectorCreator = (min, max, numberOfSectors) => {
   const step = (max - min) / numberOfSectors
-  return (value: number): number => Math.min(Math.trunc((value - min) / step), numberOfSectors - 1)
+  return (value) => Math.min(Math.trunc((value - min) / step), numberOfSectors - 1)
 }

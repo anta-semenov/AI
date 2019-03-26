@@ -1,4 +1,4 @@
-import math from 'mathjs'
+import * as math from 'mathjs'
 import {subrange} from '../utils/subrange'
 import {increaseIndex} from '../utils/increaseIndex'
 
@@ -61,7 +61,7 @@ export const convolutionLayer = (input, filters, step, trashold) => {
   return convolutionResult
 }
 
-export const convolutionLayerCreator = (dnaIndex: number, dna: number[], {size, step, trashold}) => {
+export const convolutionLayerCreator = (dnaIndex, dna, {size, step, trashold}) => {
   const weigthsAmount = size.reduce((result, item) => result * item, 1)
   const filters = math.reshape(dna.slice(dnaIndex + 1, dnaIndex + 1 + weigthsAmount), size)
   const layer = input => convolutionLayer(input, filters, step, trashold)

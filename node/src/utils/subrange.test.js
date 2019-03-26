@@ -108,9 +108,13 @@ describe('Subrange', () => {
       [
         [38, 39],
         [42, 43]
+      ],
+      [
+        [54, 55],
+        [58, 59]
       ]
     ]
 
-    expect(subrange(matrix, [1, 1, 1], [2, 2, 2])).toEqual(result)
+    expect(subrange(matrix, [1, 1, 1], [3, 2, 2])).toEqual(result)
   })
 })

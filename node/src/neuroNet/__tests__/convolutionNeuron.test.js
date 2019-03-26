@@ -1,4 +1,4 @@
-import math from 'mathjs'
+import * as math from 'mathjs'
 import {convolutionLayer, convolutionLayerCreator} from '../convolutionNeuron'
 
 describe('Convolution Layer Tests', () => {

@@ -2,6 +2,7 @@ import { symbols, symbolSpecs } from './constants'
 import { getQuandlData } from './utils/quandlRequests'
 import { getAlphavantageData } from './utils/alphavantageRequest'
 import * as path from 'path'
+import { Instrument } from './types'
 
 interface SymbolSpec {
   provider: 'quandl' | 'alphavantage',
@@ -10,9 +11,9 @@ interface SymbolSpec {
   processingValue: (value: number) => number
 }
 
-const downloadSymbolData = (symbol: string): Promise<void> => {
-  const symbolSpec = symbolSpecs[symbol] as SymbolSpec
-  const fileName = path.resolve(`../DataSetsRaw/${symbol}.json`)
+const downloadSymbolData = (instrument: Instrument): Promise<void> => {
+  const symbolSpec = symbolSpecs[instrument] as SymbolSpec
+  const fileName = path.resolve(`../DataSetsRaw/${instrument}.json`)
 
   if (symbolSpec.provider === 'quandl') {
     return getQuandlData(symbolSpec.id, new Date(2000, 0, 3), new Date(), fileName)
@@ -23,10 +24,10 @@ const downloadSymbolData = (symbol: string): Promise<void> => {
 
 
 const donwloadNextSymbol = (index: number) => {
-  if (index >= symbols.length) {
+  if (index >= Instrument.all.length) {
     return
   } else {
-    downloadSymbolData(symbols[index])
+    downloadSymbolData(Instrument.all[index])
       .then(() => setTimeout(() => donwloadNextSymbol(index + 1), 1000))
   }
 }

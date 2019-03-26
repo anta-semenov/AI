@@ -1,30 +1,30 @@
 import {convolutionLayerCreator} from './convolutionNeuron'
 import {fullConnectedLayerCreator} from './fullConnected'
 
-type ConvolutionLayer = {
-  type: 'convolution',
-  size: number[],
-  step: number
-}
+// type ConvolutionLayer = {
+//   type: 'convolution',
+//   size: number[],
+//   step: number
+// }
+//
+// type KohonenLayer = {
+//   type: 'kohonen',
+//   size: number[],
+//   step: number
+// }
+//
+// type FullConnectedLayer = {
+//   type: 'fullConnected',
+//   size: number
+// }
+//
+// type NetSchema = {
+//   layers: Array<ConvolutionLayer | FullConnectedLayer>,
+//   numberOfSymbols: number,
+//   weigthsDNA?: number[]
+// }
 
-type KohonenLayer = {
-  type: 'kohonen',
-  size: number[],
-  step: number
-}
-
-type FullConnectedLayer = {
-  type: 'fullConnected',
-  size: number
-}
-
-type NetSchema = {
-  layers: Array<ConvolutionLayer | FullConnectedLayer>,
-  numberOfSymbols: number,
-  weigthsDNA?: number[]
-}
-
-export const getLayerOutputSize = (layer: ConvolutionLayer | FullConnectedLayer, numberOfSymbols: number) => {
+export const getLayerOutputSize = (layer, numberOfSymbols) => {
   if (layer.type === 'fullConnected') {
     return layer.size
   } else {
@@ -32,7 +32,7 @@ export const getLayerOutputSize = (layer: ConvolutionLayer | FullConnectedLayer,
   }
 }
 
-export const netCreator = ({layers, numberOfSymbols, weigthsDNA}: NetSchema) => {
+export const netCreator = ({layers, numberOfSymbols, weigthsDNA}) => {
   let dnaIndex = 0
   const convolutionLayers = []
   const fullConnectedLayers = []
@@ -54,7 +54,7 @@ export const netCreator = ({layers, numberOfSymbols, weigthsDNA}: NetSchema) => 
       dnaIndex = creatorResult.dnaIndex
     }
   })
-  const net = (input: number[][][]) => {
+  const net = (input) => {
     let output = []
     console.log('====================');
     input.forEach(instrumentInput => {
