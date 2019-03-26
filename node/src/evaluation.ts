@@ -2,14 +2,16 @@ import { load } from './utils/file'
 import * as fs from 'fs'
 import { INPUT_DEEP } from './constants'
 import { Instrument, InstrumentDayData, DayData } from './types'
+import { format } from 'date-fns'
 
 const leverage = 20
 
 const getDealResult = (amount: number, startPrice: number, closePrice: number, isSell = false) => {
+  const tradeAmount = amount * leverage
   if (isSell) {
-    return (amount * leverage) * (1 - closePrice / startPrice)
+    return (tradeAmount) * (1 - closePrice / startPrice)
   } else {
-    return (amount * leverage) * (closePrice / startPrice - 1)
+    return (tradeAmount) * (closePrice / startPrice - 1)
   }
 }
 
@@ -28,7 +30,7 @@ const logDeal = (result: number, deposit: number, amount: number, symbolDayData:
   //   return
   // }
   // console.log(`${type} result: ${Math.trunc(result)}, depo: ${Math.trunc(deposit)}, symbol: ${symbol}, amount: ${Math.trunc(amount)}, openPrice: ${symbolDayData.open}, closePrice: ${symbolDayData.close}, stopPrice: ${stopPrice}, low: ${symbolDayData.low}, high: ${symbolDayData.high}`)
-  console.log(`${type} result: ${Math.trunc(result)}, depo: ${Math.trunc(deposit)}, symbol: ${symbol}, resultRate: ${resultRate}, volRate: ${volatilityRate}, date: ${date}, amount: ${Math.trunc(amount)}, openPrice: ${symbolDayData.open}, closePrice: ${closePrice}, stopPrice: ${stopPrice}`)
+  console.log(`${type} result: ${Math.trunc(result)}, depo: ${Math.trunc(deposit)}, symbol: ${symbol}, resultRate: ${resultRate}, volRate: ${volatilityRate}, date: ${format(date, 'DD-MM-YYYY')}, amount: ${Math.trunc(amount)}, openPrice: ${symbolDayData.open}, closePrice: ${closePrice}, stopPrice: ${stopPrice}`)
 }
 
 const writeChartData = (chartData: Array<string[] | number[]>) => {
@@ -77,21 +79,21 @@ export const evaluateModel = () => {
       } else if (isBuy) {
         totalDeals++
         const stopPrice = symbolDayData.open - symbolDayData.avgVol * 1.2
-        const closePrice = stopPrice < symbolDayData.low ? symbolDayData.close : stopPrice
+        const closePrice = symbolDayData.low > stopPrice ? symbolDayData.close : stopPrice
         const amount = getDealAmount(dayDeposit, symbolDayData.avgVol, symbolDayData.open, numberOfDeals)
-        const result = getDealResult(amount, symbolDayData.open, closePrice)
-        result > 0 ? loseDeals++ : winDeals++
+        const result = getDealResult(amount, symbolDayData.open * 1.0002, closePrice, false)
+        result < 0 ? loseDeals++ : winDeals++
         logDeal(result, deposit, amount, symbolDayData, stopPrice, symbol, closePrice, 'buy')
         deposit = deposit + result
         chartData.push([totalDeals, deposit])
       } else if (isSell) {
         totalDeals++
         const stopPrice = symbolDayData.open + symbolDayData.avgVol * 1.2
-        const closePrice = stopPrice > symbolDayData.high ? symbolDayData.close : stopPrice
+        const closePrice = symbolDayData.high < stopPrice ? symbolDayData.close : stopPrice
         const amount = getDealAmount(dayDeposit, symbolDayData.avgVol, symbolDayData.open, numberOfDeals)
-        const result = getDealResult(amount, symbolDayData.open, closePrice, true)
+        const result = getDealResult(amount, symbolDayData.open * 0.9998, closePrice, true)
         logDeal(result, deposit, amount, symbolDayData, stopPrice, symbol, closePrice, 'sell')
-        result > 0 ? loseDeals++ : winDeals++
+        result < 0 ? loseDeals++ : winDeals++
         deposit = deposit + result
         chartData.push([totalDeals, deposit])
       }
