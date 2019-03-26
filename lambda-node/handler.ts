@@ -1,11 +1,12 @@
 import * as AWS from 'aws-sdk'
 import { Callback } from 'aws-lambda'
-import { kohonenNet } from '../node/src/neuroNet/kohonen'
+import { kohonenNet, converKohonenClass, kohonen } from '../node/src/neuroNet/kohonen'
 import * as dateFns from 'date-fns'
+import { Instrument, ExtremumPeriod, InstrumentDayData, ExtremumData, KeyedDictionary, NetWeights, NetworkType, SymbolData } from '../node/src/types'
+import { mapKeysAndValues, mapValues, flattenArray } from '../node/src/utils/standard'
 
 // const symbols = ['AUD', 'EUR', 'GBP', 'CHF', 'CAD', 'JPY', 'Brent', 'Gold', 'Wheat', 'Soybean', 'XOM']
-const INPUT_DEEP = 84
-const DEFAULT_MIN = 999999999999
+const INPUT_DEEP = 22
 
 interface Price {
   open: number
@@ -15,21 +16,7 @@ interface Price {
   date: number
 }
 
-enum Symbol {
-  AUD = 'AUD',
-  EUR = 'EUR',
-  GBP = 'GBP',
-  CHF = 'CHF',
-  CAD = 'CAD',
-  JPY = 'JPY',
-  Brent = 'Brent',
-  Gold = 'Gold',
-  Silver = 'Silver',
-  Platinum = 'Platinum',
-  Gas = 'Gas',
-}
-
-const fxProSymbolMap: Record<Symbol, string> = {
+const fxProSymbolMap: Record<Instrument, string> = {
   AUD: 'AUDUSD',
   EUR: 'EURUSD',
   GBP: 'GBPUSD',
@@ -44,30 +31,7 @@ const fxProSymbolMap: Record<Symbol, string> = {
 }
 
 interface InputPayload {
-  [symbol: string]: Price;
-}
-
-interface DayData {
-  date: number
-  open: number
-  close: number
-  high: number
-  low: number
-  maxAbsolute: number
-  minAbsolute: number
-  maxLocal: number
-  minLocal: number
-  avgVol: number
-}
-
-interface SymbolData {
-  lastDate: number
-  minAbsolute: number
-  maxAbsolute: number
-  last20Low: number[]
-  last20High: number[]
-  volatility: number[]
-  dayData: DayData[]
+  [symbol: string]: Price
 }
 
 enum Deal {
@@ -106,81 +70,79 @@ function normalize(value: number, min: number, max: number): number {
 
 export async function predict(event: any, _: any, callback: Callback) {
   const body: InputPayload = JSON.parse((event.body as string).replace('\u0000', ''))
-  const symbolsData = await getS3Data('antonsemenov-ai-files', 'symbolsData.json') as { [symbol: string]: SymbolData }
-  Object.values(Symbol).forEach((symbol: string) => {
-    const symbolData = symbolsData[symbol]
+  const symbolsData = await getS3Data('antonsemenov-ai-files', 'symbolsData.json') as KeyedDictionary<Instrument, SymbolData>
+  Instrument.all.forEach((symbol) => {
+    if (!symbolsData[symbol]) {
+      throw Error(`Don't have instrument ${symbol} in symbolsData.json`)
+    }
+    const symbolData = symbolsData[symbol]!
+    if (!symbolData.extremumStorage || !symbolData.dayData[0].extremumData) {
+      throw Error(`Old format of symbolsData.json`)
+    }
     const input = body[fxProSymbolMap[symbol]]
     const inputDate = dateFns.parse(input.date).getTime()
 
     if (Number(symbolData.lastDate) < inputDate) {
       symbolData.lastDate = inputDate
 
-      symbolData.maxAbsolute = Math.max(symbolData.maxAbsolute, input.high)
-      symbolData.minAbsolute = Math.min(symbolData.minAbsolute, input.low)
-      symbolData.last20Low.unshift(input.low)
-      symbolData.last20High.unshift(input.high)
-      symbolData.volatility.unshift(Math.trunc(Math.abs(input.high - input.low) * 100000) / 100000)
+      symbolData.extremumStorage = mapKeysAndValues(
+        symbolData.extremumStorage,
+        (period: ExtremumPeriod, storage) => ExtremumPeriod.updateExtremumData({ max: input.high, min: input.low }, period, storage!),
+      )
+      symbolData.volatility = [Math.abs(input.high - input.low), ...symbolData.volatility.slice(0, INPUT_DEEP - 1)]
 
-      if (symbolData.last20Low.length > INPUT_DEEP) {
-        symbolData.last20Low = symbolData.last20Low.slice(0, INPUT_DEEP)
-        symbolData.last20High = symbolData.last20High.slice(0, INPUT_DEEP)
-        symbolData.volatility = symbolData.volatility.slice(0, INPUT_DEEP)
-      }
-
-      const dataForSet = ({
+      const dataForSet: InstrumentDayData = ({
         date: inputDate,
         open: input.open,
         close: input.close,
         high: input.high,
         low: input.low,
-        maxAbsolute: symbolData.maxAbsolute,
-        minAbsolute: symbolData.minAbsolute,
-        maxLocal: symbolData.last20High.reduce((res, item) => Math.max(res, item || 0), 0),
-        minLocal: symbolData.last20Low.reduce((res, item) => Math.min(res, item || DEFAULT_MIN), DEFAULT_MIN),
-        avgVol: Math.trunc(symbolData.volatility.reduce((res, item) => res + item, 0) * 100000 / symbolData.volatility.length) / 100000
+        extremumData: mapValues(symbolData.extremumStorage, (storage) => ExtremumPeriod.getExtremumData(storage!)) as Record<ExtremumPeriod, ExtremumData>,
+        avgVol: Math.trunc(symbolData.volatility.reduce((res, item) => res + item, 0) * 100000 / symbolData.volatility.length) / 100000,
       })
 
-      symbolData.dayData.unshift(dataForSet)
-      if (symbolData.dayData.length > INPUT_DEEP) {
-        symbolData.dayData = symbolData.dayData.slice(0, INPUT_DEEP)
-      }
+      symbolData.dayData = [dataForSet, ...symbolData.dayData.slice(0, INPUT_DEEP - 1)]
     }
   })
 
   await putS3Data('antonsemenov-ai-files', 'symbolsData.json', symbolsData)
 
   // prepare kohonen output
-  const kohonenAbsoluteLayers = await getS3Data('antonsemenov-ai-files', 'kohonenAbsoluteLayers.json')
-  const kohonenLocalLayers = await getS3Data('antonsemenov-ai-files', 'kohonenLocalLayers.json')
+  const kohonenNetWeights = await getS3Data('antonsemenov-ai-files', 'kohonenNetWeights.json') as NetWeights
   let kohonenResult: number[] = []
 
-  Object.values(Symbol).forEach((symbol: string) => {
-    const symbolData = symbolsData[symbol]
+  Instrument.all.forEach((instrument) => {
+    const symbolData = symbolsData[instrument]!
     if (symbolData.dayData.length !== INPUT_DEEP) {
-      callback(Error(`Day data size of ${symbol} not equal input size`), null)
+      callback(Error(`Day data size of ${instrument} not equal input size`), null)
     }
 
-    const kohonenInputLocal = symbolData.dayData.map(({open, close, high, low, minLocal, maxLocal}) => {
-      return [
-        normalize(open, minLocal, maxLocal),
-        normalize(high, minLocal, maxLocal),
-        normalize(low, minLocal, maxLocal),
-        normalize(close, minLocal, maxLocal),
-      ]
-    })
-    const localTFInputs = kohonenNet(kohonenInputLocal, kohonenLocalLayers, true)
+    const convolutionKohonenResult = flattenArray(Object.keys(kohonenNetWeights.extremumLayersWeights).map((period: ExtremumPeriod) => {
+      const kohonenInputData = symbolData.dayData.map(({ open, close, high, low, extremumData }) => {
+        const { min, max } = extremumData[period]
+        return [
+          normalize(open, min, max),
+          normalize(high, min, max),
+          normalize(low, min, max),
+          normalize(close, min, max),
+        ]
+      })
 
-    const kohonenInputAbsolute = symbolData.dayData.map(({open, close, high, low, minAbsolute, maxAbsolute}) => {
-      return [
-        normalize(open, minAbsolute, maxAbsolute),
-        normalize(high, minAbsolute, maxAbsolute),
-        normalize(low, minAbsolute, maxAbsolute),
-        normalize(close, minAbsolute, maxAbsolute),
-      ]
-    })
-    const absoluteTFInputs = kohonenNet(kohonenInputAbsolute, kohonenAbsoluteLayers, true)
+      return kohonenNet(kohonenInputData, kohonenNetWeights.extremumLayersWeights[period])
+    }))
 
-    kohonenResult = [...kohonenResult, ...localTFInputs, ...absoluteTFInputs]
+    if (convolutionKohonenResult.length !== Object.keys(kohonenNetWeights.extremumLayersWeights).length) {
+      throw Error('kohonen extremum net returns not plain clases')
+    }
+
+    if (kohonenNetWeights.type === NetworkType.Union) {
+      const unnionKohonenClass = converKohonenClass(kohonen(convolutionKohonenResult, kohonenNetWeights.unionLayerWeights.filters), kohonenNetWeights.unionLayerSpecs.size)
+      kohonenResult = [...kohonenResult, ...unnionKohonenClass]
+    } else {
+      const numberOfFilters = kohonenNetWeights.extremumLayersSpecs[kohonenNetWeights.extremumLayersSpecs.length - 1].size[0]
+      const convertedConvolutionKohonenResult = flattenArray(convolutionKohonenResult.map((resultClass) => converKohonenClass(resultClass, numberOfFilters)))
+      kohonenResult = [...kohonenResult, ...convertedConvolutionKohonenResult]
+    }
   })
 
   // await putS3Data('antonsemenov-ai-files', 'kohonen-result.json', JSON.stringify(kohonenResult))
@@ -191,7 +153,7 @@ export async function predict(event: any, _: any, callback: Callback) {
   const params = {
     FunctionName : 'lambda-python-dev-keras',
     InvocationType : 'RequestResponse',
-    Payload: JSON.stringify(kohonenResult)
+    Payload: JSON.stringify(kohonenResult),
   }
   const pythonResponse = await lambda.invoke(params).promise()
   if (!(pythonResponse.Payload && typeof pythonResponse.Payload === 'string')) {
@@ -202,11 +164,11 @@ export async function predict(event: any, _: any, callback: Callback) {
   const numberOfDeals = predictions.reduce((res, value) => value > 0.7 ? res + 1 : res, 0)
 
   const result: { [symbol: string]: SymbolResult } = {}
-  Object.values(Symbol).forEach((symbol: string, symbolIndex: number) => {
+  Instrument.all.forEach((symbol, symbolIndex) => {
     const isBuy = predictions[symbolIndex * 2] > 0.7
     const isSell = predictions[symbolIndex * 2 + 1] > 0.7
 
-    const dayData = symbolsData[symbol].dayData[0]
+    const dayData = symbolsData[symbol]!.dayData[0]
 
     if (isBuy && isSell) {
       result[fxProSymbolMap[symbol]] = { deal: Deal.nothing }
@@ -240,12 +202,12 @@ export function sendErrorEmail(event: any, _: any, callback: Callback) {
         Text: {
           Charset: 'UTF-8',
           Data: text,
-        }
+        },
       },
       Subject: {
         Charset: 'UTF-8',
         Data: 'Error in AI expert',
-      }
+      },
     },
     Source: 'anta.semenov@icloud.com',
   }, (err) => {

@@ -46,6 +46,7 @@ export namespace ExtremumPeriod {
   }
 
   export const all: ExtremumPeriod[] = [ExtremumPeriod.Short, ExtremumPeriod.Absolute] // Object.values(ExtremumPeriod).filter((v) => typeof v === 'string')
+  // export const all1: ExtremumPeriod[] = Object.values(ExtremumPeriod).filter((v) => typeof v === 'string')
 }
 
 export interface ExtremumData {
@@ -83,4 +84,11 @@ export interface RawInstrumentData {
   dataset: {
     data: number[][],
   }
+}
+
+export interface SymbolData {
+  lastDate: number
+  extremumStorage: KeyedDictionary<ExtremumPeriod, ExtremumDataStorage>
+  volatility: number[]
+  dayData: InstrumentDayData[]
 }

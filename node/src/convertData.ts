@@ -1,25 +1,13 @@
 import * as fs from 'fs'
 // import * as dateFns from 'date-fns'
-import {INPUT_DEEP} from './constants'
+import { INPUT_DEEP } from './constants'
+import { Instrument, SymbolData, KeyedDictionary, ExtremumPeriod, ExtremumData, InstrumentDayData } from './types'
+import { mapKeysAndValues, mapValues } from './utils/standard'
 
 // const INPUT_DEEP = 22
-const DEFAULT_MIN = 999999999999
+// const DEFAULT_MIN = 999999999999
 
-enum Symbol {
-  AUD = 'AUD',
-  EUR = 'EUR',
-  GBP = 'GBP',
-  CHF = 'CHF',
-  CAD = 'CAD',
-  JPY = 'JPY',
-  Brent = 'Brent',
-  Gold = 'Gold',
-  Silver = 'Silver',
-  Platinum = 'Platinum',
-  Gas = 'Gas',
-}
-
-const fxProSymbolMap: { [symbol: string]: string } = {
+const fxProSymbolMap: Record<Instrument, string> = {
   AUD: 'AUDUSD',
   EUR: 'EURUSD',
   GBP: 'GBPUSD',
@@ -28,9 +16,6 @@ const fxProSymbolMap: { [symbol: string]: string } = {
   JPY: 'USDJPY',
   Brent: 'BRENT',
   Gold: 'GOLD',
-  Wheat: '#Wheat_U8',
-  Soybean: '#Soybean_U8',
-  XOM: '#ExxonMobil',
   Silver: 'SILVER',
   Platinum: 'PLATINUM',
   Gas: 'NAT.GAS',
@@ -40,7 +25,7 @@ interface Dictionary<T> {
   [symbol: string]: T
 }
 
-const symbolsData = JSON.parse(fs.readFileSync('../lambdaData/DataForFix.json') as any) as Dictionary<SymbolData>
+const symbolsData = JSON.parse(fs.readFileSync('../lambdaData/DataForFix.json') as any) as KeyedDictionary<Instrument, SymbolData | OldSymbolData>
 const fxProRawData = JSON.parse(fs.readFileSync('../lambdaData/data.json') as any) as Dictionary<Dictionary<Price>>
 
 interface Price {
@@ -64,7 +49,7 @@ interface DayData {
   avgVol: number
 }
 
-interface SymbolData {
+interface OldSymbolData {
   lastDate: number
   minAbsolute: number
   maxAbsolute: number
@@ -81,62 +66,75 @@ interface SymbolData {
 // })
 
 const addPriceData = (source: SymbolData, priceData: Price): SymbolData => {
+  if (priceData.low === 0 || priceData.high === 0 || priceData.open === 0 || priceData.close === 0) {
+    throw Error(`0 data`)
+  }
   const result = {
-    ...source
+    ...source,
   }
   if (result.lastDate > priceData.date) {
     return result
   }
 
   result.lastDate = priceData.date
-  result.maxAbsolute = Math.max(result.maxAbsolute, priceData.high)
-  result.minAbsolute = Math.min(result.minAbsolute, priceData.low)
-  result.last20Low.unshift(priceData.low)
-  result.last20High.unshift(priceData.high)
-  result.volatility.unshift(Math.trunc(Math.abs(priceData.high - priceData.low) * 100000) / 100000)
+  result.extremumStorage = mapKeysAndValues(
+    result.extremumStorage,
+    (period: ExtremumPeriod, storage) => ExtremumPeriod.updateExtremumData({ max: priceData.high, min: priceData.low }, period, storage!),
+  )
+  result.volatility = [Math.abs(priceData.high - priceData.low), ...result.volatility.slice(0, INPUT_DEEP - 1)]
 
-  if (result.last20Low.length > INPUT_DEEP) {
-    result.last20Low = result.last20Low.slice(0, INPUT_DEEP)
-    result.last20High = result.last20High.slice(0, INPUT_DEEP)
-    result.volatility = result.volatility.slice(0, INPUT_DEEP)
-  }
-
-  const dataForSet = ({
+  const dataForSet: InstrumentDayData = ({
     date: priceData.date,
     open: priceData.open,
     close: priceData.close,
     high: priceData.high,
     low: priceData.low,
-    maxAbsolute: result.maxAbsolute,
-    minAbsolute: result.minAbsolute,
-    maxLocal: result.last20High.reduce((res, item) => Math.max(res, item || 0), 0),
-    minLocal: result.last20Low.reduce((res, item) => Math.min(res, item || DEFAULT_MIN), DEFAULT_MIN),
-    avgVol: Math.trunc(result.volatility.reduce((res, item) => res + item, 0) * 100000 / result.volatility.length) / 100000
+    extremumData: mapValues(result.extremumStorage, (storage) => ExtremumPeriod.getExtremumData(storage!)) as Record<ExtremumPeriod, ExtremumData>,
+    avgVol: Math.trunc(result.volatility.reduce((res, item) => res + item, 0) * 100000 / result.volatility.length) / 100000,
   })
 
-  result.dayData.unshift(dataForSet)
-  if (result.dayData.length > INPUT_DEEP) {
-    result.dayData = result.dayData.slice(0, INPUT_DEEP)
-  }
+  result.dayData = [dataForSet, ...result.dayData.slice(0, INPUT_DEEP - 1)]
 
   return result
 }
 
-const resultData: { [symbol: string]: SymbolData } = {}
+const resultData: KeyedDictionary<Instrument, SymbolData> = {}
 
-Object.values(Symbol).forEach((symbol: string) => {
-  const symbolData = symbolsData[symbol]
-  let tempData: SymbolData = {
-    lastDate: 0,
-    minAbsolute: symbolData.minAbsolute,
-    maxAbsolute: symbolData.maxAbsolute,
-    last20Low: [],
-    last20High: [],
-    volatility: [],
-    dayData: [],
+Instrument.all.forEach((symbol) => {
+  const symbolData = symbolsData[symbol]!
+  let tempData: SymbolData
+  if ((symbolData as any).maxAbsolute && (symbolData as any).maxAbsolute) {
+    tempData = {
+      lastDate: 0,
+      extremumStorage: {
+        [ExtremumPeriod.Short]: { min: [], max: [] },
+        [ExtremumPeriod.HalfYear]: { min: [], max: [] },
+        [ExtremumPeriod.Year]: { min: [], max: [] },
+        [ExtremumPeriod.Absolute]: { min: [(symbolData as OldSymbolData).minAbsolute], max: [(symbolData as OldSymbolData).maxAbsolute] },
+      },
+      volatility: [],
+      dayData: [],
+    }
+  } else {
+    tempData = {
+      lastDate: 0,
+      extremumStorage: {
+        [ExtremumPeriod.Short]: { min: [], max: [] },
+        [ExtremumPeriod.HalfYear]: { min: [], max: [] },
+        [ExtremumPeriod.Year]: { min: [], max: [] },
+        [ExtremumPeriod.Absolute]: (symbolData as SymbolData).extremumStorage.Absolute,
+      },
+      volatility: [],
+      dayData: [],
+    }
   }
 
-  const prices = Object.values(fxProRawData[fxProSymbolMap[symbol]]).sort((a, b) => a.date - b.date)
+  const prices = Object.values(fxProRawData[fxProSymbolMap[symbol]]).sort((a, b) => a.date - b.date).filter((priceData) => priceData.low != 0 && priceData.high != 0 && priceData.open != 0 && priceData.close != 0)
+
+  if (prices.length < 290) {
+    const message = `Don't have enought data for instrument ${symbol}, ${prices.length}`
+    throw Error(message)
+  }
 
   prices.forEach((priceData) => {
     tempData = addPriceData(tempData, priceData)

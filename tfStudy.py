@@ -22,7 +22,7 @@ for dayData in learnData:
     trainOutput.append(dayData['output'])
 
 model = Sequential([
-    Dense(80, input_shape=(352,)),
+    Dense(80, input_shape=(len(trainInput[0]),)),
     Dense(22)
 ])
 
