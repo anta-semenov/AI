@@ -34,7 +34,7 @@ const testStrategy = (kohonenCycle: number) => {
   execSync('./runModel.sh 2', { cwd: '../' })
   checkEvaluation()
 
-  let i = 500
+  let i = 151
   while (i >= 0) {
     console.log(`kohonen cycle ${kohonenCycle}, kerasCycle: ${i}`)
     i--
@@ -43,7 +43,7 @@ const testStrategy = (kohonenCycle: number) => {
   }
 }
 
-let k = 10
+let k = 20
 while (k >= 0 ) {
   testStrategy(k)
   k--

@@ -1,4 +1,4 @@
-const math = require('mathjs')
+import * as math from 'mathjs'
 import { mapMatrix } from '../utils/mapMatrix'
 import { KohonenConvolutionLayerWeights } from '../types'
 
@@ -7,12 +7,12 @@ export const getDistance = (input: number[], weigths: number[]): number => weigt
 }, 0)
 
 export const kohonen = (input: Array<number | number[]>, filters: Array<number[] | number[][]>): number => {
-  const flatInput = math.flatten(input)
+  const flatInput = math.flatten(input as any) as number[]
   let minValue: number
   let minFilterIndex = -1001
 
   filters.forEach((filter, filterIndex) => {
-    const flatFilter = math.flatten(filter)
+    const flatFilter = math.flatten(filter) as number[]
     if (flatFilter.length !== flatInput.length) {
       throw Error('Kohonen: Filter and Input have different size')
     }
@@ -33,7 +33,7 @@ export const kohonen = (input: Array<number | number[]>, filters: Array<number[]
 }
 
 export const kohonenConvolutionLayer = (input: Array<number | number[]>, filters: Array<number[] | number[][]>, step: number): Array<number | number[]> => {
-  const inputSize = math.size(input)
+  const inputSize = math.size(input as any) as number[]
   const filterSize = math.size(filters[0]) as number[]
 
   if (filterSize.length !== inputSize.length) {

@@ -1,4 +1,4 @@
-const math = require('mathjs')
+import * as math from 'mathjs'
 import { subrange } from './subrange'
 import { increaseIndex } from './increaseIndex'
 
@@ -17,7 +17,7 @@ export const checkFilterIndex = (filterIndex: number[], filterSize: number[], in
 }
 
 export const mapMatrix = (matrix: Array<number | number[] | number[][]>, subrangeSize: number[], step: number, callback: (subrange: Array<number | number[]>) => number | number[] | number[][]): Array<number | number[] | number[][]> => {
-  const matrixSize = math.size(matrix)
+  const matrixSize = math.size(matrix as any) as number[]
 
   const result = []
 
