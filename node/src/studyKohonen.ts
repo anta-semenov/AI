@@ -59,7 +59,7 @@ const netSpecs: NetSpecs = {
     },
     {
       type: LayerType.ConvolutionKohonen,
-      size: [16, 4],
+      size: [17, 4],
       step: 2,
     },
   ],

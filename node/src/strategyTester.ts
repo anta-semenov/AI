@@ -30,11 +30,11 @@ total: ${evaluation.totalDeals}, win: ${evaluation.winDeals}, lose: ${evaluation
 }
 
 const testStrategy = (kohonenCycle: number) => {
-  console.log(`kohonen cycle ${kohonenCycle}, kerasCycle: 501`)
+  console.log(`kohonen cycle ${kohonenCycle}, kerasCycle: 151`)
   execSync('./runModel.sh 2', { cwd: '../' })
   checkEvaluation()
 
-  let i = 151
+  let i = 150
   while (i >= 0) {
     console.log(`kohonen cycle ${kohonenCycle}, kerasCycle: ${i}`)
     i--
