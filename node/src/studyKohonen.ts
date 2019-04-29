@@ -63,10 +63,10 @@ const netSpecs: NetSpecs = {
       step: 2,
     },
   ],
-  unionLayer: {
-    type: LayerType.UnionKohonen,
-    size: 40,
-  },
+  // unionLayer: {
+  //   type: LayerType.UnionKohonen,
+  //   size: 30,
+  // },
 }
 
 const convolutionWeights: KeyedDictionary<ExtremumPeriod, KohonenConvolutionLayerWeights[]> = {}

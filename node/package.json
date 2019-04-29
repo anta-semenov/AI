@@ -17,7 +17,8 @@
     "describePedictions": "node ./lib/operation/describePrediction.js",
     "convertData": "ts-node ./src/convertData.ts",
     "downloadRawData": "ts-node ./src/downloadSymbolsRawData.ts",
-    "testStrategies": "ts-node ./src/strategyTester.ts"
+    "testStrategies": "ts-node ./src/strategyTester.ts",
+    "comparePrices": "ts-node ./src/comparePrices.ts"
   },
   "author": "",
   "license": "MIT",

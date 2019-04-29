@@ -22,13 +22,14 @@ for dayData in learnData:
     trainOutput.append(dayData['output'])
 
 model = Sequential([
-    Dense(70, input_shape=(len(trainInput[0]),)),
+    Dense(170, input_shape=(len(trainInput[0]),)),
+    Dense(50),
     Dense(22)
 ])
 
 model.compile(optimizer='rmsprop', loss='mean_squared_error', metrics=['accuracy'])
 
-model.fit(np.array(trainInput)[0:1932], np.array(trainOutput)[0:1932], epochs=100, batch_size=21)
+model.fit(np.array(trainInput)[0:1995], np.array(trainOutput)[0:1995], epochs=100, batch_size=21)
 
 np.save('./DataSet/keras_weights', model.get_weights())
 with open('./DataSet/keras_config.json', 'w') as configFile:
