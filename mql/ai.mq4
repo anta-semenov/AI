@@ -97,15 +97,20 @@ void OnTick()
       closeAllOrders();
       closeAllOrders();
       closeAllOrders();
-      closeAllOrders();
-      closeAllOrders();
-      closeAllOrders();
       closeOrdersToday = true;
    }
    double deposit = AccountBalance();
 
    if (symbolSatelite == true) {
       if (getTradeFlagForSymbol(Symbol()) == false) {
+         int backendDateFile = FileOpen("backendResponseLastDate.txt", FILE_READ);
+         int requestDate = FileReadInteger(backendDateFile);
+         FileClose(requestDate);
+         if (Time[0] != requestDate) {
+            sendErrorEmal("Error: " + Symbol() + " last date not equal to backend request date");
+            return;
+         }
+
          int backandFile = FileOpen("backendResponse.txt", FILE_READ);
          string backendString = FileReadString(backandFile);
          FileClose(backandFile);
@@ -186,6 +191,10 @@ void OnTick()
       int file = FileOpen("backendResponse.txt", FILE_WRITE);
       FileWriteString(file, payload.toString());
       FileClose(file);
+
+      int fileDate = FileOpen("backendResponseLastDate.txt", FILE_WRITE);
+      FileWriteInteger(fileDate, Time[0]);
+      FileClose(fileDate);
    }
 
    if (sendRequestToBackend == true) {
@@ -235,6 +244,10 @@ void openPosition(string symbol, double sl, int numberOfDeals, string action, do
    RefreshRates();
    double openPrice = action == "buy" ? MarketInfo(symbol, MODE_ASK) : MarketInfo(symbol, MODE_BID);
    orderTicket = OrderSend(symbol, orderType, lot, openPrice, 20, openPrice + slDiff, 0, NULL, magicNumber);
+   if (lot == 0) {
+     sendErrorEmal("Error while open position: " + symbol + " - " + action + " lot: " + lot + ". Error: lot is 0");
+     return;
+   }
    if (orderTicket < 0) {
      int attempts = 0;
      while (orderTicket < 0 && GetLastError() == 136 && attempts < 5) {
@@ -248,7 +261,7 @@ void openPosition(string symbol, double sl, int numberOfDeals, string action, do
          }
       }
       if (orderTicket < 0) {
-         sendErrorEmal("Error while open position: " + symbol + " - " + action + ". Error: " + GetLastError());
+         sendErrorEmal("Error while open position: " + symbol + " - " + action + " lot: " + lot + ". Error: " + GetLastError());
       } else {
          setTradeFlagForSymbol(symbol, true);
       }
