@@ -246,6 +246,7 @@ void openPosition(string symbol, double sl, int numberOfDeals, string action, do
    orderTicket = OrderSend(symbol, orderType, lot, openPrice, 20, openPrice + slDiff, 0, NULL, magicNumber);
    if (lot == 0) {
      sendErrorEmal("Error while open position: " + symbol + " - " + action + " lot: " + lot + ". Error: lot is 0");
+     setTradeFlagForSymbol(symbol, true);
      return;
    }
    if (orderTicket < 0) {
