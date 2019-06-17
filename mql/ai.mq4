@@ -104,10 +104,10 @@ void OnTick()
    if (symbolSatelite == true) {
       if (getTradeFlagForSymbol(Symbol()) == false) {
          int backendDateFile = FileOpen("backendResponseLastDate.txt", FILE_READ);
-         int requestDate = FileReadInteger(backendDateFile);
-         FileClose(requestDate);
-         if (Time[0] != requestDate) {
-            sendErrorEmal("Error: " + Symbol() + " last date not equal to backend request date");
+         int requestDate = FileReadString(backendDateFile);
+         FileClose(backendDateFile);
+         if (TimeToString(Time[0], TIME_DATE) != requestDate) {
+            sendErrorEmal("Error: " + Symbol() + " last date (" + TimeToString(Time[0], TIME_DATE) + ") not equal to backend request date (" + requestDate + ")");
             return;
          }
 
@@ -193,7 +193,7 @@ void OnTick()
       FileClose(file);
 
       int fileDate = FileOpen("backendResponseLastDate.txt", FILE_WRITE);
-      FileWriteInteger(fileDate, Time[0]);
+      FileWriteString(fileDate, TimeToString(Time[0], TIME_DATE));
       FileClose(fileDate);
    }
 
