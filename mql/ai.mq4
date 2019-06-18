@@ -104,7 +104,7 @@ void OnTick()
    if (symbolSatelite == true) {
       if (getTradeFlagForSymbol(Symbol()) == false) {
          int backendDateFile = FileOpen("backendResponseLastDate.txt", FILE_READ);
-         int requestDate = FileReadString(backendDateFile);
+         string requestDate = FileReadString(backendDateFile);
          FileClose(backendDateFile);
          if (TimeToString(Time[0], TIME_DATE) != requestDate) {
             sendErrorEmal("Error: " + Symbol() + " last date (" + TimeToString(Time[0], TIME_DATE) + ") not equal to backend request date (" + requestDate + ")");
