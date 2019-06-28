@@ -70,6 +70,7 @@ function normalize(value: number, min: number, max: number): number {
 
 export async function predict(event: any, _: any, callback: Callback) {
   const body: InputPayload = JSON.parse((event.body as string).replace('\u0000', ''))
+  console.log('Payload body: ', body)
   const symbolsData = await getS3Data('antonsemenov-ai-files', 'symbolsData.json') as KeyedDictionary<Instrument, SymbolData>
   Instrument.all.forEach((symbol) => {
     if (!symbolsData[symbol]) {
@@ -81,6 +82,8 @@ export async function predict(event: any, _: any, callback: Callback) {
     }
     const input = body[fxProSymbolMap[symbol]]
     const inputDate = dateFns.parse(input.date).getTime()
+
+    console.log(`Process ${symbol}: symbol last date - ${symbolData.lastDate}, input date - ${inputDate}, iput data - ${input}`)
 
     if (Number(symbolData.lastDate) < inputDate) {
       symbolData.lastDate = inputDate
