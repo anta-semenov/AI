@@ -60,6 +60,7 @@ void OnTick()
    if (MarketInfo(Symbol(), MODE_TRADEALLOWED) == 0) {
       return;
    }
+
    if (Time[0] != lastTime) {
        lastTime = Time[0];
        shouldTradeToday = true;
@@ -74,6 +75,17 @@ void OnTick()
       closeAllOrders();
       closeAllOrders();
    }
+   bool allSymbolsAreSync = true;
+   for(int i=0; i<11; i++) {
+     string symbol = symbols[i];
+     if (Time[0] != iTime(symbol, PERIOD_D1, 0)) {
+       allSymbolsAreSync = false;
+     }
+   }
+   if (!allSymbolsAreSync) {
+     return;
+   }
+
    if (TimeCurrent() > lastTime + 2 * 60 * 60) {
       shouldTradeToday = false;
       for(int i=0; i<11; i++) {
