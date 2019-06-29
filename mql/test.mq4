@@ -18,7 +18,7 @@ void OnStart()
   {
 //---
    //closeAllOrders();
-   string symbols[11] = {"AUDUSD", "EURUSD", "GBPUSD", "USDCHF", "USDCAD", "USDJPY", "BRENT", "GOLD", "#Wheat_U8", "#Soybean_U8", "#ExxonMobil"};
+   string symbols[11] = {"AUDUSD", "EURUSD", "GBPUSD", "USDCHF", "USDCAD", "USDJPY", "BRENT", "GOLD", "SILVER", "PLATINUM", "NAT.GAS"};
    JSONObject *symbolsData = new JSONObject();
 
    for(int i=0; i<11; i++) {
@@ -26,7 +26,7 @@ void OnStart()
 
       JSONObject *dayData = new JSONObject();
 
-      for (int k=1; k<=180; k++) {
+      for (int k=1; k<=400; k++) {
          JSONObject *symbolData = new JSONObject();
 
          symbolData.put("high", new JSONNumber(iHigh(symbol, PERIOD_D1, k)));
