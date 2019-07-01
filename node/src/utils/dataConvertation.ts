@@ -54,7 +54,12 @@ export const convertData = () => {
   })
 
   const tempLearnDataArray = Object.values(tempLearnData).filter((dayData) => Object.keys(dayData).length === Instrument.all.length)
-  const tempTestDataArray = Object.values(tempTestData).filter((dayData) => Object.keys(dayData).length === Instrument.all.length)
+  const tempTestDataArray = Object.values(tempTestData).filter((dayData) => {
+    if (Object.keys(dayData).length !== Instrument.all.length) {
+      console.log('missing data: ', Object.keys(dayData), dateFns.format(((dayData as any)[Object.keys(dayData)[0]] as any).date, 'DD-MM-YYYY'))
+    }
+    return Object.keys(dayData).length === Instrument.all.length
+  })
 
   const perDateData: InstrumentsData = {
     [DataType.LearnData]: tempLearnDataArray,
