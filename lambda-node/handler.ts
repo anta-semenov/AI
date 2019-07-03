@@ -72,6 +72,7 @@ export async function predict(event: any, _: any, callback: Callback) {
   const body: InputPayload = JSON.parse((event.body as string).replace('\u0000', ''))
   console.log('Payload body: ', body)
   const symbolsData = await getS3Data('antonsemenov-ai-files', 'symbolsData.json') as KeyedDictionary<Instrument, SymbolData>
+  const symbolsWithoutFreshData: Instrument[] = []
   Instrument.all.forEach((symbol) => {
     if (!symbolsData[symbol]) {
       throw Error(`Don't have instrument ${symbol} in symbolsData.json`)
@@ -105,8 +106,18 @@ export async function predict(event: any, _: any, callback: Callback) {
       })
 
       symbolData.dayData = [dataForSet, ...symbolData.dayData.slice(0, INPUT_DEEP - 1)]
+    } else {
+      symbolsWithoutFreshData.push(symbol)
     }
   })
+
+  if (symbolsWithoutFreshData.length > 0 && symbolsWithoutFreshData.length < Instrument.all.length) {
+    try {
+      sendErrorEmail({ body: `Instruments with missing data: ${symbolsWithoutFreshData.join(', ')}` }, null, () => {})
+    } catch {
+      //
+    }
+  }
 
   await putS3Data('antonsemenov-ai-files', 'symbolsData.json', symbolsData)
 

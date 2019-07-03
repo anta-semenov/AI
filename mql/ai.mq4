@@ -58,10 +58,12 @@ void OnTick()
   {
 //---
    if (MarketInfo(Symbol(), MODE_TRADEALLOWED) == 0) {
+      Print("Trading not allowed");
       return;
    }
 
    if (Time[0] != lastTime) {
+       Print("Start of a new day");
        lastTime = Time[0];
        shouldTradeToday = true;
        sendRequestToBackend = false;
@@ -70,6 +72,7 @@ void OnTick()
        }
        closeOrdersToday = false;
    }
+   //Print("Time current " + TimeCurrent() + " | " + Time[0]);
 
    if (TimeCurrent() > lastTime + 24 * 60 *60 - timeBeforeCloseTreshold * 60) {
       closeAllOrders();
@@ -80,13 +83,19 @@ void OnTick()
      string symbol = symbols[i];
      if (Time[0] != iTime(symbol, PERIOD_D1, 0)) {
        allSymbolsAreSync = false;
+       // Print("Time[0]=" + Time[0] + " symbol " + symbol + " time=" + iTime(symbol, PERIOD_D1, 0));
      }
    }
-   if (!allSymbolsAreSync) {
+   // Print("All symbols sync check = " + allSymbolsAreSync);
+   if (!allSymbolsAreSync && TimeCurrent() < lastTime + 20 * 60) {
      return;
    }
+   // Print("symbols are synced");
 
-   if (TimeCurrent() > lastTime + 2 * 60 * 60) {
+   if (TimeCurrent() > lastTime + 4 * 60 * 60 && shouldTradeToday) {
+      if (getTradeFlagForSymbol(Symbol()) == false) {
+         Print("Too late for trading: " + TimeCurrent() + " | " + (lastTime + 2 * 60 * 60));
+      }
       shouldTradeToday = false;
       for(int i=0; i<11; i++) {
          setTradeFlagForSymbol(symbols[i], true);
@@ -96,6 +105,7 @@ void OnTick()
    if (!shouldTradeToday) {
       return;
    }
+   Print("trade");
    // shouldTradeToday = false;
 
    if (!closeOrdersToday) {
@@ -156,12 +166,16 @@ void OnTick()
          string symbol = symbols[i];
 
          JSONObject *symbolData = new JSONObject();
+         int timeFrameIndex = 1;
+         if (Time[0] != iTime(symbol, PERIOD_D1, 0) && Time[1] == iTime(symbol, PERIOD_D1, 0)) {
+            timeFrameIndex = 0;
+         }
 
-         symbolData.put("high", new JSONNumber(iHigh(symbol, PERIOD_D1, 1)));
-         symbolData.put("low", new JSONNumber(iLow(symbol, PERIOD_D1, 1)));
-         symbolData.put("open", new JSONNumber(iOpen(symbol, PERIOD_D1, 1)));
-         symbolData.put("close", new JSONNumber(iClose(symbol, PERIOD_D1, 1)));
-         symbolData.put("date", new JSONNumber(iTime(symbol, PERIOD_D1, 1) * 1000));
+         symbolData.put("high", new JSONNumber(iHigh(symbol, PERIOD_D1, timeFrameIndex)));
+         symbolData.put("low", new JSONNumber(iLow(symbol, PERIOD_D1, timeFrameIndex)));
+         symbolData.put("open", new JSONNumber(iOpen(symbol, PERIOD_D1, timeFrameIndex)));
+         symbolData.put("close", new JSONNumber(iClose(symbol, PERIOD_D1, timeFrameIndex)));
+         symbolData.put("date", new JSONNumber(iTime(symbol, PERIOD_D1, timeFrameIndex) * 1000));
 
          symbolsData.put(symbol, symbolData);
       }
