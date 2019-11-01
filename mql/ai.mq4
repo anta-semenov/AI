@@ -154,6 +154,9 @@ void OnTick()
          } else {
             setTradeFlagForSymbol(Symbol(), true);
          }
+
+         delete fileParser;
+         delete backendData;
       }
 
       return;
@@ -190,6 +193,7 @@ void OnTick()
       int res = WebRequest("POST", url, NULL, timeout, post, result, responseHeader);
       // SendMail("from fx pro", "test message");
       sendRequestToBackend = true;
+      delete symbolsData;
 
       JSONParser *parser = new JSONParser();
       JSONValue *response = parser.parse(CharArrayToString(result));
@@ -200,6 +204,8 @@ void OnTick()
          for(int i=0; i<11; i++) {
             setTradeFlagForSymbol(symbols[i], true);
          }
+         delete parser;
+         delete response;
          return;
       }
 
@@ -211,6 +217,8 @@ void OnTick()
          for(int i=0; i<11; i++) {
             setTradeFlagForSymbol(symbols[i], true);
          }
+         delete parser;
+         delete response;
          return;
       }
 
@@ -221,6 +229,8 @@ void OnTick()
       int fileDate = FileOpen("backendResponseLastDate.txt", FILE_WRITE);
       FileWriteString(fileDate, TimeToString(Time[0], TIME_DATE));
       FileClose(fileDate);
+      delete parser;
+      delete response;
    }
 
    if (sendRequestToBackend == true) {
@@ -253,6 +263,9 @@ void OnTick()
             setTradeFlagForSymbol(symbol, true);
          }
       }
+
+      delete fileParser;
+      delete payload;
    }
 
 
