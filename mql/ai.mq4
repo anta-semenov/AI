@@ -17,6 +17,7 @@ input bool symbolSatelite;
 input int magicNumber;
 input double minLotCost = 50.0;
 input int timeBeforeCloseTreshold = 2;
+input string symbolFilePrefix = "";
 
 string symbols[11] = {"AUDUSD", "EURUSD", "GBPUSD", "USDCHF", "USDCAD", "USDJPY", "BRENT", "GOLD", "SILVER", "PLATINUM", "NAT.GAS"};
 bool sendRequestToBackend = false;
@@ -181,6 +182,10 @@ void OnTick()
          symbolData.put("date", new JSONNumber(iTime(symbol, PERIOD_D1, timeFrameIndex) * 1000));
 
          symbolsData.put(symbol, symbolData);
+      }
+
+      if (symbolFilePrefix != "") {
+        symbolsData.put("symbolDataPrefix", new JSONString(symbolFilePrefix));
       }
 
       int timeout = 20000;

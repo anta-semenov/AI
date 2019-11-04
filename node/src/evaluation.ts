@@ -50,7 +50,7 @@ export const evaluateModel = () => {
     throw Error(`dayData and predictions lengths aren't equal ${predictions.length}, ${dayData.length}`)
   }
 
-  const startDeposit = 1000
+  const startDeposit = 500
   let deposit = startDeposit
   let totalDeals = 0
   let winDeals = 0

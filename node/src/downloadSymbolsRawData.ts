@@ -1,4 +1,4 @@
-import { symbols, symbolSpecs } from './constants'
+import { symbolSpecs } from './constants'
 import { getQuandlData } from './utils/quandlRequests'
 import { getAlphavantageData } from './utils/alphavantageRequest'
 import * as path from 'path'

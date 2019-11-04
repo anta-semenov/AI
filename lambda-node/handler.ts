@@ -71,7 +71,11 @@ function normalize(value: number, min: number, max: number): number {
 export async function predict(event: any, _: any, callback: Callback) {
   const body: InputPayload = JSON.parse((event.body as string).replace('\u0000', ''))
   console.log('Payload body: ', body)
-  const symbolsData = await getS3Data('antonsemenov-ai-files', 'symbolsData.json') as KeyedDictionary<Instrument, SymbolData>
+  let symbolDataName = 'symbolsData.json'
+  if (typeof body.symbolDataPrefix === 'string') {
+    symbolDataName = `${body.symbolDataPrefix}_${symbolDataName}`
+  }
+  const symbolsData = await getS3Data('antonsemenov-ai-files', symbolDataName) as KeyedDictionary<Instrument, SymbolData>
   const symbolsWithoutFreshData: Instrument[] = []
   Instrument.all.forEach((symbol) => {
     if (!symbolsData[symbol]) {
