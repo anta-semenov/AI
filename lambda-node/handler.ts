@@ -204,6 +204,13 @@ export async function predict(event: any, _: any, callback: Callback) {
     body: JSON.stringify(result),
   }
 
+  await putS3Data('antonsemenov-ai-files', `kohonenKerasResults_${dateFns.format(body[fxProSymbolMap[Instrument.EUR]].date, 'YYYY-MM-DD')}.json`, {
+    predictionInterpretation: result,
+    kerasResults: predictions,
+    kohonenResults: kohonenResult,
+    inputPayload: body,
+  })
+
   callback(null, response)
 }
 

@@ -19,6 +19,8 @@ const fxProSymbolMap: Record<Instrument, string> = {
 
 const fxRawData = JSON.parse(fs.readFileSync(path.resolve('../DataSetsRaw', 'fxRawData.json')).toString())
 
+const absoluteExtremumData = JSON.parse(fs.readFileSync(path.resolve('../lambdaData', 'DataForFix.json')).toString())
+
 Instrument.all.forEach((instrument) => {
   const fxInstrumentData = fxRawData[fxProSymbolMap[instrument]]
 
@@ -45,8 +47,16 @@ Instrument.all.forEach((instrument) => {
       convertPrice(data.close),
     ])
 
+  const absoluteExtremumInstrumentData = [
+    '2016-01-22',
+    convertPrice(absoluteExtremumData[instrument].minAbsolute),
+    convertPrice(absoluteExtremumData[instrument].maxAbsolute),
+    convertPrice(absoluteExtremumData[instrument].minAbsolute),
+    convertPrice(absoluteExtremumData[instrument].maxAbsolute),
+  ]
+
   fs.writeFileSync(
     path.resolve('../DataSetsRaw', `${instrument}.json`),
-    JSON.stringify({ dataset: { data: instrumentData } }),
+    JSON.stringify({ dataset: { data: [absoluteExtremumInstrumentData, ...instrumentData] } }),
   )
 })

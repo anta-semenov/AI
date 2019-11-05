@@ -151,7 +151,7 @@ void OnTick()
          if (action != "nothing") {
             double sl = symbolData.getDouble("sl");
             int numberOfDeals = symbolData.getInt("numberOfDeals");
-            openPosition(Symbol(), sl, numberOfDeals, action, deposit);
+            // openPosition(Symbol(), sl, numberOfDeals, action, deposit);
          } else {
             setTradeFlagForSymbol(Symbol(), true);
          }
@@ -263,7 +263,7 @@ void OnTick()
          if (action != "nothing") {
             double sl = symbolResponse.getDouble("sl");
             int numberOfDeals = symbolResponse.getInt("numberOfDeals");
-            openPosition(symbol, sl, numberOfDeals, action, deposit);
+            // openPosition(symbol, sl, numberOfDeals, action, deposit);
          } else {
             setTradeFlagForSymbol(symbol, true);
          }
