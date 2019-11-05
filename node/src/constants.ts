@@ -54,7 +54,7 @@ export const symbolSpecs = {
     provider: 'quandl',
     id: 'CME_JY1',
     apiUrl: 'https://www.quandl.com/api/v3/datasets/CHRIS/CME_JY1.json?api_key=hMdg3RhBV_oi6qsDQcrv&start_date=2000-01-01&end_date=2018-09-22',
-    processingValue: (value: number) => Math.trunc(100000000 / value) / 100,
+    processingValue: (value: number) => Math.trunc(1000000000 / value) / 1000,
   },
   [Instrument.Brent]: {
     provider: 'quandl',

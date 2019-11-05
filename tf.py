@@ -51,7 +51,15 @@ json_data=open('./DataSet/keras_config.json').read()
 modelConfig = json.loads(json_data) #
 modelWeights = np.load('./DataSet/keras_weights.npy') #
 model = Sequential.from_config(modelConfig)
-model.set_weights(modelWeights)
+# model.set_weights(modelWeights)
+
+with open('./temp', 'w') as outfile:
+    pickle.dump(modelWeights, outfile)
+
+with open('./temp', 'rb') as data:
+    modelWeights1 = pickle.load(data)
+
+model.set_weights(modelWeights1)
 
 testInput = []
 testOutput = []

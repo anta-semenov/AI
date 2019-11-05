@@ -73,8 +73,10 @@ export const prepareTFData = (instrumentsData: InstrumentsData, weights: NetWeig
         // run kohonenNet для каждого символа для local и absolute
         // и добовляем inputs результата
         // console.log('++++', inputBuffer[symbol].local.length);
-        const convolutionKohonenResult = flattenArray(ExtremumPeriod.all.map((period) => kohonenNet((inputBuffer[instrument]!)[period]!, weights.extremumLayersWeights[period])))
-        if (convolutionKohonenResult.length !== ExtremumPeriod.all.length) {
+        const convolutionKohonenResult = flattenArray(Object.keys(weights.extremumLayersWeights).map((period: ExtremumPeriod) => {
+          return kohonenNet((inputBuffer[instrument]!)[period]!, weights.extremumLayersWeights[period])
+        }))
+        if (convolutionKohonenResult.length !== Object.keys(weights.extremumLayersWeights).length) {
           throw Error('kohonen extremum net returns not plain clases')
         }
         if (weights.type === NetworkType.Union) {

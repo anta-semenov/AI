@@ -119,8 +119,8 @@ const processFile = (instrument: Instrument): Record<DataType, InstrumentDayData
     return ({
       date: dateFns.parse(rawDayData[0]).getTime(),
       open: convertNumber(rawDayData[1]),
-      high: convertNumber(rawDayData[2]),
-      low: convertNumber(rawDayData[3]),
+      high: Math.max(convertNumber(rawDayData[2]), convertNumber(rawDayData[3])),
+      low: Math.min(convertNumber(rawDayData[3]), convertNumber(rawDayData[2])),
       close: convertNumber(rawDayData[4]),
     })
   }).sort((a, b) => a.date - b.date)

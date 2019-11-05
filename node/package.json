@@ -18,7 +18,8 @@
     "convertData": "ts-node ./src/convertData.ts",
     "downloadRawData": "ts-node ./src/downloadSymbolsRawData.ts",
     "testStrategies": "ts-node ./src/strategyTester.ts",
-    "comparePrices": "ts-node ./src/comparePrices.ts"
+    "comparePrices": "ts-node ./src/comparePrices.ts",
+    "convertFXData": "ts-node ./src/convertFxRawDataToQuandlRawData.ts"
   },
   "author": "",
   "license": "MIT",
