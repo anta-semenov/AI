@@ -49,7 +49,7 @@ const netSpecs: NetSpecs = {
   convolutionLayers: [
     {
       type: LayerType.ConvolutionKohonen,
-      size: [12, 4, 4],
+      size: [10, 4, 4],
       step: 2,
     },
     {

@@ -175,7 +175,7 @@ const processFile = (instrument: Instrument): Record<DataType, InstrumentDayData
       extremumData: mapValues(extremumStorage, (periodStorage) => ExtremumPeriod.getExtremumData(periodStorage!)) as Record<ExtremumPeriod, ExtremumData>,
     })
 
-    if (dayData.date < dateFns.parse('2019-09-01').getTime()) {
+    if (dayData.date < dateFns.parse('2010-01-01').getTime()) {
       learnData = [...learnData, dataForSet]
     } else {
       testData = [...testData, dataForSet]

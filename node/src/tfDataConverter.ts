@@ -61,7 +61,7 @@ export const prepareTFData = (instrumentsData: InstrumentsData, weights: NetWeig
         // берем текущие данные и результат за пред день и вычисляем выходы
         const symbolDayData = dataItem[instrument]!
         const symbolDayResult = getSymbolDayResult(
-          source[index + 1][instrument]!.open,
+          source[index + 1] != null ? source[index + 1][instrument]!.open : 0,
           symbolDayData.open,
           symbolDayData.low,
           symbolDayData.high,
@@ -76,6 +76,7 @@ export const prepareTFData = (instrumentsData: InstrumentsData, weights: NetWeig
         const convolutionKohonenResult = flattenArray(Object.keys(weights.extremumLayersWeights).map((period: ExtremumPeriod) => {
           return kohonenNet((inputBuffer[instrument]!)[period]!, weights.extremumLayersWeights[period])
         }))
+
         if (convolutionKohonenResult.length !== Object.keys(weights.extremumLayersWeights).length) {
           throw Error('kohonen extremum net returns not plain clases')
         }
@@ -88,14 +89,13 @@ export const prepareTFData = (instrumentsData: InstrumentsData, weights: NetWeig
           // TODO: update kohonen net types
           dayResult.input = [...dayResult.input, ...convertedConvolutionKohonenResult]
         }
-
-
-        // добавляем данные текущего дня в инпут сети
-        inputBuffer = mapValues(inputBuffer, (extremumData: ExtremumLayersInput) => {
-          return mapValues(extremumData, (dataArray) => dataArray!.slice(0, -1)) as Record<ExtremumPeriod, number[][]>
-        })
-        inputBuffer = mapKeysAndValues(inputBuffer, (instrument: Instrument, extremumData: ExtremumLayersInput) => addKohonenInputData(extremumData, instrument, dataItem))
       })
+
+      // добавляем данные текущего дня в инпут сети
+      inputBuffer = mapValues(inputBuffer, (extremumData: ExtremumLayersInput) => {
+        return mapValues(extremumData, (dataArray) => dataArray!.slice(0, -1)) as Record<ExtremumPeriod, number[][]>
+      })
+      inputBuffer = mapKeysAndValues(inputBuffer, (instrument: Instrument, extremumData: ExtremumLayersInput) => addKohonenInputData(extremumData, instrument, dataItem))
 
       resultData.push(dayResult)
     }
