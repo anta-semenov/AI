@@ -61,12 +61,13 @@ with open('./temp', 'rb') as data:
 
 model.set_weights(modelWeights1)
 
-testInput = []
-testOutput = []
 predictOutput = []
 for dayData in testData:
     prediction = model.predict(np.array([dayData['input']]), batch_size=1)
-    predictOutput.append(prediction.tolist()[0])
+    predictOutput.append({
+        'prediction': prediction.tolist()[0],
+        'raw': dayData['raw'],
+    })
 
 with open('./predictions.json', 'w') as outfile:
     json.dump(predictOutput, outfile)

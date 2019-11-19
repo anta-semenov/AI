@@ -1,7 +1,5 @@
-import { load } from './utils/file'
 import * as fs from 'fs'
-import { INPUT_DEEP } from './constants'
-import { Instrument, InstrumentDayData, DayData } from './types'
+import { Instrument, KeyedDictionary, InstrumentEvaluationDayData } from './types'
 import { format } from 'date-fns'
 
 const leverage = 20
@@ -22,7 +20,7 @@ const getDealAmount = (deposit:  number, avgVol:  number, startPrice:  number, n
   return 50 * Math.trunc(amount / 50)
 }
 
-const logDeal = (result: number, deposit: number, amount: number, symbolDayData: InstrumentDayData, stopPrice: number, symbol: Instrument, closePrice: number, type: 'buy' | 'sell') => {
+const logDeal = (result: number, deposit: number, amount: number, symbolDayData: InstrumentEvaluationDayData, stopPrice: number, symbol: Instrument, closePrice: number, type: 'buy' | 'sell') => {
   const date = new Date(symbolDayData.date)
   const volatilityRate = ((symbolDayData.high - symbolDayData.low) / symbolDayData.avgVol).toFixed(2)
   const resultRate = Number((result * 100 / deposit).toFixed(0))
@@ -42,13 +40,13 @@ const writeChartData = (chartData: Array<string[] | number[]>) => {
   fs.writeFileSync('./graph/data.js', fileContent)
 }
 
-export const evaluateModel = () => {
-  const predictions = JSON.parse(fs.readFileSync('../predictions.json').toString()) as number[][]
-  const dayData = load('perDateData').TestData.slice(INPUT_DEEP) as DayData[]
+interface PredictionItem {
+  prediction: number[]
+  raw: KeyedDictionary<Instrument, InstrumentEvaluationDayData>
+}
 
-  if ((predictions.length + 1) !== dayData.length) {
-    throw Error(`dayData and predictions lengths aren't equal ${predictions.length}, ${dayData.length}`)
-  }
+export const evaluateModel = () => {
+  const predictions = JSON.parse(fs.readFileSync('../predictions.json').toString()) as PredictionItem[]
 
   const startDeposit = 500
   let deposit = startDeposit
@@ -63,16 +61,20 @@ export const evaluateModel = () => {
     [`${totalDeals}`, deposit],
   ]
 
-  predictions.forEach((predict: number[], predictIndex: number) => {
-    const numberOfDeals = predict.reduce((res, value) => value > 0.7 ? res + 1 : res, 0)
+  predictions.forEach((item: PredictionItem) => {
+    const numberOfDeals = item.prediction.reduce((res, value) => value > 0.7 ? res + 1 : res, 0)
     const dayDeposit = deposit
     // console.log('+++', dayDeposit, numberOfDeals);
 
     Instrument.all.forEach((symbol, symbolIndex) => {
-      const symbolDayData = dayData[predictIndex][symbol]!
+      const symbolDayData = item.raw[symbol]
 
-      const isBuy = predict[symbolIndex * 2] > 0.7
-      const isSell = predict[symbolIndex * 2 + 1] > 0.7
+      if (symbolDayData == null) {
+        throw Error('No raw data for evaluation')
+      }
+
+      const isBuy = item.prediction[symbolIndex * 2] > 0.5
+      const isSell = item.prediction[symbolIndex * 2 + 1] > 0.5
 
       if (isBuy && isSell) {
         return

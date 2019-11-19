@@ -10,10 +10,10 @@ const addKohonenInputData = (input: ExtremumLayersInput, instrument: Instrument,
   return mapKeysAndValues(input, (period: ExtremumPeriod, data: number[][]) => {
     const { min, max } = extremumData[period]
     const dayData = [
-      normalize(open, min, max),
-      normalize(high, min, max),
-      normalize(low, min, max),
-      normalize(close, min, max),
+      Number(normalize(open, min, max).toFixed(4)),
+      Number(normalize(high, min, max).toFixed(4)),
+      Number(normalize(low, min, max).toFixed(4)),
+      Number(normalize(close, min, max).toFixed(4)),
     ]
     return [dayData, ...data]
   })

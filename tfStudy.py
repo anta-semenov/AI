@@ -22,25 +22,27 @@ for dayData in learnData:
     trainOutput.append(dayData['output'])
 
 model = Sequential([
-    Dense(170, input_shape=(len(trainInput[0]),)),
+    Dense(220, input_shape=(len(trainInput[0]),)),
+    Dense(110),
     Dense(50),
     Dense(22)
 ])
 
 model.compile(optimizer='rmsprop', loss='mean_squared_error', metrics=['accuracy'])
 
-model.fit(np.array(trainInput)[0:1995], np.array(trainOutput)[0:1995], epochs=100, batch_size=21)
+model.fit(np.array(trainInput)[0:3255], np.array(trainOutput)[0:3255], epochs=100, batch_size=21)
 
 np.save('./DataSet/keras_weights', model.get_weights())
 with open('./DataSet/keras_config.json', 'w') as configFile:
     json.dump(model.get_config(), configFile)
 
-testInput = []
-testOutput = []
 predictOutput = []
 for dayData in testData:
     prediction = model.predict(np.array([dayData['input']]), batch_size=1)
-    predictOutput.append(prediction.tolist()[0])
+    predictOutput.append({
+        'prediction': prediction.tolist()[0],
+        'raw': dayData['raw'],
+    })
 
 with open('./predictions.json', 'w') as outfile:
     json.dump(predictOutput, outfile)

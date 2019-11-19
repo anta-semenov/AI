@@ -19,12 +19,14 @@
     "downloadRawData": "ts-node ./src/downloadSymbolsRawData.ts",
     "testStrategies": "ts-node ./src/strategyTester.ts",
     "comparePrices": "ts-node ./src/comparePrices.ts",
-    "convertFXData": "ts-node ./src/convertFxRawDataToQuandlRawData.ts"
+    "convertFXData": "ts-node ./src/convertFxRawDataToQuandlRawData.ts",
+    "prepareLSTMInput": "ts-node ./src/prepareLSTMSimpleModelInputData.ts"
   },
   "author": "",
   "license": "MIT",
   "dependencies": {
     "date-fns": "^1.29.0",
+    "majime": "^4.2.0",
     "mathjs": "^3.16.5",
     "node-fetch": "^2.1.2"
   },

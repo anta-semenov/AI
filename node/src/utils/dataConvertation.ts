@@ -104,8 +104,8 @@ export const convertData = () => {
   console.log('nullCloseCount: ', nullCloseCount)
   console.log('nullHighCount: ', nullHighCount)
   console.log('nullLowCount: ', nullLowCount)
-  console.log(`learn data whole: ${result.LearnData[Instrument.AUD]!.length}, filtered: ${tempLearnDataArray.length}`)
-  console.log(`test data whole: ${result.TestData[Instrument.AUD]!.length}, filtered: ${tempTestDataArray.length}`)
+  console.log(`learn data whole: ${result.LearnData[Instrument.Gold]!.length}, filtered: ${tempLearnDataArray.length}`)
+  console.log(`test data whole: ${result.TestData[Instrument.Gold]!.length}, filtered: ${tempTestDataArray.length}`)
   console.log('==============================')
 }
 
@@ -175,7 +175,7 @@ const processFile = (instrument: Instrument): Record<DataType, InstrumentDayData
       extremumData: mapValues(extremumStorage, (periodStorage) => ExtremumPeriod.getExtremumData(periodStorage!)) as Record<ExtremumPeriod, ExtremumData>,
     })
 
-    if (dayData.date < dateFns.parse('2010-01-01').getTime()) {
+    if (dayData.date < dateFns.parse('2015-01-01').getTime()) {
       learnData = [...learnData, dataForSet]
     } else {
       testData = [...testData, dataForSet]

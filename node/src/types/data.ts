@@ -45,7 +45,7 @@ export namespace ExtremumPeriod {
     return { min: Math.min(...storage.min), max: Math.max(...storage.max) }
   }
 
-  export const all: ExtremumPeriod[] = [ExtremumPeriod.Short, ExtremumPeriod.Absolute] // Object.values(ExtremumPeriod).filter((v) => typeof v === 'string')
+  export const all: ExtremumPeriod[] = [ExtremumPeriod.Short, ExtremumPeriod.HalfYear, ExtremumPeriod.Year, ExtremumPeriod.Absolute] // Object.values(ExtremumPeriod).filter((v) => typeof v === 'string')
   // export const all1: ExtremumPeriod[] = Object.values(ExtremumPeriod).filter((v) => typeof v === 'string')
 }
 
@@ -91,4 +91,13 @@ export interface SymbolData {
   extremumStorage: KeyedDictionary<ExtremumPeriod, ExtremumDataStorage>
   volatility: number[]
   dayData: InstrumentDayData[]
+}
+
+export interface InstrumentEvaluationDayData {
+  date: number
+  open: number,
+  close: number,
+  high: number,
+  low: number,
+  avgVol: number,
 }
