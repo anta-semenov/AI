@@ -20,7 +20,8 @@
     "testStrategies": "ts-node ./src/strategyTester.ts",
     "comparePrices": "ts-node ./src/comparePrices.ts",
     "convertFXData": "ts-node ./src/convertFxRawDataToQuandlRawData.ts",
-    "prepareLSTMInput": "ts-node ./src/prepareLSTMSimpleModelInputData.ts"
+    "prepareLSTMInput": "ts-node ./src/prepareLSTMSimpleModelInputData.ts",
+    "updateHourData": "ts-node ./src/updateHourData.ts"
   },
   "author": "",
   "license": "MIT",

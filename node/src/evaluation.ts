@@ -73,8 +73,8 @@ export const evaluateModel = () => {
         throw Error('No raw data for evaluation')
       }
 
-      const isBuy = item.prediction[symbolIndex * 2] > 0.5
-      const isSell = item.prediction[symbolIndex * 2 + 1] > 0.5
+      const isBuy = item.prediction[symbolIndex * 2] > 0.7
+      const isSell = item.prediction[symbolIndex * 2 + 1] > 0.7
 
       if (isBuy && isSell) {
         return
@@ -84,7 +84,7 @@ export const evaluateModel = () => {
         const closePrice = symbolDayData.low > stopPrice ? symbolDayData.close : stopPrice
         const amount = getDealAmount(dayDeposit, symbolDayData.avgVol, symbolDayData.open, numberOfDeals)
         const result = getDealResult(amount, symbolDayData.open * 1.0002, closePrice, false)
-        result < 0 ? loseDeals++ : winDeals++
+        result <= 0 ? loseDeals++ : winDeals++
         logDeal(result, deposit, amount, symbolDayData, stopPrice, symbol, closePrice, 'buy')
         deposit = deposit + result
         chartData.push([totalDeals, deposit])
@@ -95,7 +95,7 @@ export const evaluateModel = () => {
         const amount = getDealAmount(dayDeposit, symbolDayData.avgVol, symbolDayData.open, numberOfDeals)
         const result = getDealResult(amount, symbolDayData.open * 0.9998, closePrice, true)
         logDeal(result, deposit, amount, symbolDayData, stopPrice, symbol, closePrice, 'sell')
-        result < 0 ? loseDeals++ : winDeals++
+        result <= 0 ? loseDeals++ : winDeals++
         deposit = deposit + result
         chartData.push([totalDeals, deposit])
       }

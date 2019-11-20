@@ -1,6 +1,6 @@
 import { kohonenNet, kohonen, converKohonenClass } from './neuroNet/kohonen'
 import { INPUT_DEEP } from './constants'
-import { ExtremumPeriod, NetWeights, DayData, Instrument, InstrumentsData, DataType, KeyedDictionary, NetworkType } from './types'
+import { ExtremumPeriod, NetWeights, DayData, Instrument, InstrumentsData, DataType, KeyedDictionary, NetworkType, InstrumentEvaluationDayData } from './types'
 import { groupByAndMap, mapValues, mapKeysAndValues, flattenArray, normalize } from './utils/standard'
 
 type ExtremumLayersInput = KeyedDictionary<ExtremumPeriod, number[][]>
@@ -19,14 +19,18 @@ const addKohonenInputData = (input: ExtremumLayersInput, instrument: Instrument,
   })
 }
 
+let activeResults = 0
+
 const getSymbolDayResult = (tomorrowOpen: number, open: number, low: number, high: number, vol: number): [1, 0] | [0, 1] | [0, 0] => {
   const openDiff = Math.abs(tomorrowOpen - open)
   const lowDropdown = Math.abs(low - open)
   const highDropdown = Math.abs(high - open)
 
-  if (tomorrowOpen > open && openDiff > 0.5 * vol && lowDropdown < vol) {
+  if (tomorrowOpen > open && openDiff > 0.8 * vol && lowDropdown < vol * 0.7) {
+    activeResults++
     return [1, 0]
-  } else if (tomorrowOpen < open && openDiff > 0.5 * vol && highDropdown < vol) {
+  } else if (tomorrowOpen < open && openDiff > 0.8 * vol && highDropdown < vol * 0.7) {
+    activeResults++
     return [0, 1]
   } else {
     return [0, 0]
@@ -36,6 +40,7 @@ const getSymbolDayResult = (tomorrowOpen: number, open: number, low: number, hig
 interface DayResult {
   input: Array<1 | 0>,
   output: Array<1 | 0>,
+  raw: KeyedDictionary<Instrument, InstrumentEvaluationDayData>
 }
 
 export const prepareTFData = (instrumentsData: InstrumentsData, weights: NetWeights, dataType: DataType = DataType.LearnData) => {
@@ -45,6 +50,7 @@ export const prepareTFData = (instrumentsData: InstrumentsData, weights: NetWeig
   const source = dataType === DataType.LearnData ? instrumentsData.LearnData : instrumentsData.TestData
 
   console.log('source length', source.length)
+  activeResults = 0
 
   source.forEach((dataItem, index) => {
     if (index < INPUT_DEEP) {
@@ -54,6 +60,7 @@ export const prepareTFData = (instrumentsData: InstrumentsData, weights: NetWeig
       const dayResult: DayResult = {
         input: [],
         output: [],
+        raw: {},
       }
 
       Instrument.all.forEach((instrument) => {
@@ -68,6 +75,14 @@ export const prepareTFData = (instrumentsData: InstrumentsData, weights: NetWeig
           symbolDayData.avgVol,
         )
         dayResult.output.push(...symbolDayResult)
+        dayResult.raw[instrument] = {
+          date: symbolDayData.date,
+          open: symbolDayData.open,
+          close: symbolDayData.close,
+          low: symbolDayData.low,
+          high: symbolDayData.high,
+          avgVol: symbolDayData.avgVol,
+        }
 
         // Calculate result per symbols
         // run kohonenNet для каждого символа для local и absolute
@@ -100,6 +115,7 @@ export const prepareTFData = (instrumentsData: InstrumentsData, weights: NetWeig
       resultData.push(dayResult)
     }
   })
+  console.log('active results: ', activeResults)
 
   return resultData
 }
