@@ -2,6 +2,7 @@ import { readdirSync, readFileSync, writeFileSync, existsSync } from 'fs'
 import { resolve } from 'path'
 import { Dictionary } from './types/'
 import { format, startOfDay, parse } from 'date-fns'
+import 'majime'
 
 interface HourData {
   time: number
@@ -13,6 +14,8 @@ interface HourData {
   timeStr: string
   dateStr: string
 }
+
+const digest: Dictionary<Dictionary<string | number>> = {}
 
 const processFile  = (filename: string) => {
   const sourceData = readFileSync(resolve('../HourDataSetRaw', 'temp', filename)).toString()
@@ -38,8 +41,15 @@ const processFile  = (filename: string) => {
     }
   })
 
+  digest[instrumentName] = {
+    amount: Object.keys(instrumentHoursData).length,
+    earliestDtime: Object.values(instrumentHoursData).sorted((item1, item2) => item1.time - item2.time).firstElement()!.dateStr,
+  }
+
   writeFileSync(resolve('../HourDataSetRaw', 'archive', `${instrumentName}.json`), JSON.stringify(instrumentHoursData))
 }
 
 
 readdirSync(resolve('../HourDataSetRaw', 'temp')).forEach(processFile)
+
+writeFileSync(resolve('../HourDataSetRaw', 'digest.json'), JSON.stringify(digest))
