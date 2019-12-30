@@ -3025,9 +3025,9 @@ makeerror@1.0.x:
     tmpl "1.0.x"
 
 mathjs@^3.16.5:
-  version "3.16.5"
-  resolved "https://registry.yarnpkg.com/mathjs/-/mathjs-3.16.5.tgz#d75a5265435d2824b067b37a478771deebf6aacc"
-  integrity sha1-11pSZUNdKCSwZ7N6R4dx3uv2qsw=
+  version "3.17.0"
+  resolved "https://registry.yarnpkg.com/mathjs/-/mathjs-3.17.0.tgz#9569d278874546175c9d0497d7417eb88fb61503"
+  integrity sha512-bFDSjjLV3+csekog1L6z3FjZ0uSkRPFcMlbLef8KXxq68jtQQ48W2f+JKJugM9y6KxJEtt1zWFIGQnYKWR0nxg==
   dependencies:
     complex.js "2.0.4"
     decimal.js "7.2.3"
@@ -3035,7 +3035,7 @@ mathjs@^3.16.5:
     javascript-natural-sort "0.7.1"
     seed-random "2.2.0"
     tiny-emitter "2.0.0"
-    typed-function "0.10.5"
+    typed-function "0.10.6"
 
 mem@^1.1.0:
   version "1.1.0"
@@ -4259,10 +4259,10 @@ type-check@~0.3.2:
   dependencies:
     prelude-ls "~1.1.2"
 
-typed-function@0.10.5:
-  version "0.10.5"
-  resolved "https://registry.yarnpkg.com/typed-function/-/typed-function-0.10.5.tgz#2e0f18abd065219fab694a446a65c6d1981832c0"
-  integrity sha1-Lg8Yq9BlIZ+raUpEamXG0ZgYMsA=
+typed-function@0.10.6:
+  version "0.10.6"
+  resolved "https://registry.yarnpkg.com/typed-function/-/typed-function-0.10.6.tgz#314aa0ea72bd586de5920095559683e20b01688b"
+  integrity sha512-PYtsDjxyW3vq7Itn2RMz0cn6CrbybIY6XC2i9c1q1o/H94QW8B1Pf3wSsbBDOCMpN1i5jDRrlDsLXFaqXBpfHQ==
 
 typedarray@^0.0.6:
   version "0.0.6"
