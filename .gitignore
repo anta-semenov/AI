@@ -4,3 +4,4 @@ node/lib
 tensorflow
 .env
 node_modules
+venv
