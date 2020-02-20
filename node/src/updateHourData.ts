@@ -10,6 +10,7 @@ interface HourData {
   high: number
   low: number
   close: number
+  volume: number
   date: number
   timeStr: string
   dateStr: string
@@ -35,6 +36,7 @@ const processFile  = (filename: string) => {
       high: Number(hourData[2]),
       low: Number(hourData[3]),
       close: Number(hourData[4]),
+      volume: Number(hourData[5]),
       date: startOfDay(time).getTime(),
       timeStr: format(time, 'hh:mm'),
       dateStr: format(time, 'YYYY-MM-DD'),
