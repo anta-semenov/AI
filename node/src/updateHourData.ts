@@ -22,7 +22,7 @@ const processFile  = (filename: string) => {
   const sourceData = readFileSync(resolve('../HourDataSetRaw', 'temp', filename)).toString()
   const instrumentName = filename.split('.')[0]
 
-  const instrumentHoursData: Dictionary<HourData> = existsSync(resolve('../HourDataSetRaw', `${instrumentName}.json`))
+  const instrumentHoursData: Dictionary<HourData> = existsSync(resolve('../HourDataSetRaw', 'archive', `${instrumentName}.json`))
     ? JSON.parse(readFileSync(resolve('../HourDataSetRaw', 'archive', `${instrumentName}.json`)).toString())
     : {}
 
