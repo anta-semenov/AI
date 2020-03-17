@@ -1,3 +1,4 @@
+price,pick_up_latitude,pick_up_longitude,destination_latitude,destination_longitude,option1,option2
 10.1,-73.978488,40.741158,-74.002693,40.73989,1,0
 7.5,-73.989145,40.723001,-74.002385,40.709047,1,1
 8.1,-73.986518,40.75909,-73.978512,40.750832,1,2
