@@ -28,7 +28,7 @@
   "dependencies": {
     "date-fns": "^1.29.0",
     "majime": "^4.2.0",
-    "mathjs": "^3.16.5",
+    "mathjs": "^7.5.1",
     "node-fetch": "^2.1.2"
   },
   "devDependencies": {
